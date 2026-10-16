@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Nunito', 'Plus Jakarta Sans', sans-serif;
+  }
+}
+
+.font-chubby {
+  font-family: 'Fredoka', cursive, sans-serif;
+}
+
+.font-display {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.font-variation-fill,
+.material-symbols-fill {
+  font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+}
+
+/* 3D Tactile Buttons */
+.btn-3d {
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
+  user-select: none;
+}
+.btn-3d:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 transparent !important;
+}
+
+.shadow-duo-green {
+  box-shadow: 0 4px 0 #2d7d15;
+}
+.shadow-duo-orange {
+  box-shadow: 0 4px 0 #c95c10;
+}
+.shadow-duo-blue {
+  box-shadow: 0 4px 0 #1a2260;
+}
+.shadow-duo-neutral {
+  box-shadow: 0 4px 0 #d0cbbe;
+}
+.shadow-duo-card {
+  box-shadow: 0 6px 0 #e6e2d6;
+}
+
+.chumpi-border {
+  background-image: repeating-linear-gradient(45deg, #2a3691 0px, #2a3691 8px, #f27a21 8px, #f27a21 16px, #3ca21d 16px, #3ca21d 24px, #ffdbd1 24px, #ffdbd1 32px);
+}
+
+@keyframes floatSmooth {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(1.2deg); }
+}
+
+.floating-anim {
+  animation: floatSmooth 3.2s ease-in-out infinite;
+}
+

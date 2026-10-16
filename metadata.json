@@ -1,0 +1,7 @@
+{
+  "name": "Allikiwa - Lenguas Originarias del Perú",
+  "description": "Plataforma interactiva y lúdica para aprender y traducir Quechua Chanka y Aimara con fonética guiada, cuaderno de repaso y mascota andina.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
