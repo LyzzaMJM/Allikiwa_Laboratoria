@@ -26,7 +26,7 @@ export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate }) => {
               <img
                 alt="Logo Allikiwa"
                 className="w-12 h-12 object-contain rounded-2xl p-0.5 border-2 border-[#2a3691]/10 shadow-xs transition-transform group-hover:scale-105 duration-200"
-                src="/images/logo.png"
+                src={`${import.meta.env.BASE_URL}images/logo.png`}
               />
               <div className="flex flex-col">
                 <span className="font-playful text-2xl md:text-3xl font-bold tracking-tight text-[#f27a21] leading-tight">
@@ -289,7 +289,7 @@ export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate }) => {
                   <img
                     alt="Mascota Allikiwa Alpacata"
                     className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-lg"
-                    src="/images/pancita.png"
+                    src={`${import.meta.env.BASE_URL}images/pancita.png`}
                   />
                 </div>
 

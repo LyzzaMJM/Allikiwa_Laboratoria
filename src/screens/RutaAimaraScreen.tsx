@@ -25,7 +25,7 @@ export const RutaAimaraScreen: React.FC<Props> = ({ onNavigate }) => {
               <img
                 alt="Allikiwa Isotipo oficial"
                 className="w-10 h-10 object-contain rounded-full shadow-sm group-hover:scale-105 transition-transform"
-                src="/images/logo.png"
+                src={`${import.meta.env.BASE_URL}images/logo.png`}
               />
               <span className="font-headline-md text-headline-md font-bold text-[#f27a21] tracking-tight">
                 Allikiwa
@@ -332,7 +332,7 @@ export const RutaAimaraScreen: React.FC<Props> = ({ onNavigate }) => {
               <img
                 alt="Kusi Alpaca"
                 className="w-20 h-20 object-contain drop-shadow-md"
-                src="/images/pancita.png"
+                src={`${import.meta.env.BASE_URL}images/pancita.png`}
               />
               <div>
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#ffdbc9] text-xs font-bold text-[#753400] mb-1">

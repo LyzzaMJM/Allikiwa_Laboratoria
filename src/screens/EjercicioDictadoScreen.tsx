@@ -371,7 +371,7 @@ export const EjercicioDictadoScreen: React.FC<Props> = ({ onNavigate }) => {
                 <img
                   className="w-full h-full object-contain filter drop-shadow-md rounded-2xl"
                   alt="Pancita mascota de Allikiwa"
-                  src="/images/pancita.png"
+                  src={`${import.meta.env.BASE_URL}images/pancita.png`}
                 />
               </div>
               <div className="flex-1 bg-[#fff1ed] p-3 rounded-2xl border border-[#ffe9e4]">

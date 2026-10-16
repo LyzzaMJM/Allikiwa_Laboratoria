@@ -69,7 +69,7 @@ export const CuadernoRepasoScreen: React.FC<Props> = ({ onNavigate }) => {
               <img
                 alt="Logo Allikiwa"
                 className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
-                src="/images/logo.png"
+                src={`${import.meta.env.BASE_URL}images/logo.png`}
               />
               <div className="flex flex-col">
                 <span className="font-display text-xl font-bold text-[#f27a21] leading-none">Allikiwa</span>
@@ -160,7 +160,7 @@ export const CuadernoRepasoScreen: React.FC<Props> = ({ onNavigate }) => {
                 <img
                   alt="Mascota Kusi"
                   className="w-full h-full object-contain filter drop-shadow hover:scale-105 transition-transform duration-200"
-                  src="/images/pancita.png"
+                  src={`${import.meta.env.BASE_URL}images/pancita.png`}
                 />
               </div>
               <span className="absolute -bottom-1 -right-1 bg-[#91fb6e] text-[#042100] text-xs px-2.5 py-0.5 rounded-full border border-[#104b00] font-bold flex items-center gap-0.5">

@@ -165,7 +165,7 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
             href="#allikiwa"
           >
             <img
-              src="/images/logo.png"
+              src={`${import.meta.env.BASE_URL}images/logo.png`}
               alt="Logo Allikiwa"
               className="w-9 h-9 sm:w-11 sm:h-11 object-contain rounded-xl shadow-xs"
             />
@@ -286,7 +286,7 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
           <div className="mb-6 bg-gradient-to-r from-[#2a3691] to-[#f27a21] rounded-3xl p-0.5 shadow-lg">
             <div className="bg-white rounded-[22px] p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3 sm:gap-4">
-                <img src="/images/pancita.png" alt="Pancita" className="w-14 h-14 object-contain shrink-0" />
+                <img src={`${import.meta.env.BASE_URL}images/pancita.png`} alt="Pancita" className="w-14 h-14 object-contain shrink-0" />
                 <div>
                   <div className="font-chubby text-base sm:text-lg font-extrabold text-[#2a3691]">
                     ¡Usaste tus 5 traducciones gratis! 🎉
@@ -686,7 +686,7 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
                     <img
                       alt="Pancita la mascota oficial de Allikiwa"
                       className="w-full h-full object-contain filter drop-shadow-md select-none transform hover:rotate-3 transition-transform duration-200"
-                      src="/images/pancita.png"
+                      src={`${import.meta.env.BASE_URL}images/pancita.png`}
                     />
                   </div>
                   <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-[#2a3691] text-white font-chubby text-xs sm:text-sm font-bold shadow-md flex items-center gap-1.5 border-2 border-white whitespace-nowrap">
@@ -889,7 +889,7 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
       <footer className="w-full bg-white border-t-2 border-[#e5e2da] mt-auto">
         <div className="w-full px-4 sm:px-6 md:px-12 py-6 sm:py-8 max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-5">
           <div className="flex items-center gap-3">
-            <img src="/images/logo.png" alt="Allikiwa" className="w-8 h-8 object-contain" />
+            <img src={`${import.meta.env.BASE_URL}images/logo.png`} alt="Allikiwa" className="w-8 h-8 object-contain" />
             <div className="text-[#7a6f66] text-sm text-center md:text-left">
               <p className="font-chubby font-bold text-sm sm:text-base text-[#2a3691] mb-0.5">Allikiwa — Lenguas Originarias del Perú</p>
               <p className="font-medium text-xs sm:text-sm">© 2025 Allikiwa. Preservando el Quechua Chanka • Aimara.</p>

@@ -55,7 +55,7 @@ export const PerfilDinamicoScreen: React.FC<Props> = ({ onNavigate }) => {
               <img
                 alt="Logo Allikiwa"
                 className="w-12 h-12 object-contain rounded-2xl drop-shadow-sm group-hover:rotate-6 transition-transform duration-200"
-                src="/images/logo.png"
+                src={`${import.meta.env.BASE_URL}images/logo.png`}
               />
               <span className="font-display text-[26px] font-bold text-[#f27a21] tracking-tight">Allikiwa</span>
             </a>
@@ -263,7 +263,7 @@ export const PerfilDinamicoScreen: React.FC<Props> = ({ onNavigate }) => {
                   <img
                     alt="Kusi Alpaca"
                     className="w-full h-full object-contain filter drop-shadow-md"
-                    src="/images/pancita.png"
+                    src={`${import.meta.env.BASE_URL}images/pancita.png`}
                   />
                   <span className="absolute -bottom-1 -right-1 bg-[#ff842c] text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
                     Yachaq
@@ -300,7 +300,7 @@ export const PerfilDinamicoScreen: React.FC<Props> = ({ onNavigate }) => {
                     <img
                       alt="Avatar"
                       className="w-full h-full object-contain"
-                      src="/images/logo.png"
+                      src={`${import.meta.env.BASE_URL}images/logo.png`}
                     />
                   </div>
                 </div>

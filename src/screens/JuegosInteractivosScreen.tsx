@@ -116,7 +116,7 @@ export const JuegosInteractivosScreen: React.FC<Props> = ({ onNavigate }) => {
               <img
                 alt="Kusi Alpaca"
                 className="w-full h-full object-contain filter drop-shadow-sm"
-                src="/images/pancita.png"
+                src={`${import.meta.env.BASE_URL}images/pancita.png`}
               />
             </div>
             <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#2a3691] text-white flex items-center justify-center shadow-md">

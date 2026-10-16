@@ -14,25 +14,25 @@ export const EjercicioIlustracionScreen: React.FC<Props> = ({ onNavigate }) => {
       id: 1,
       name: 'Allqu',
       desc: 'Perro andino',
-      img: '/images/doggie.png'
+      img: `${import.meta.env.BASE_URL}images/doggie.png`
     },
     {
       id: 2,
       name: 'Michi',
       desc: 'Gato andino',
-      img: '/images/verde.png'
+      img: `${import.meta.env.BASE_URL}images/verde.png`
     },
     {
       id: 3,
       name: 'Wikuña',
       desc: 'Vicuña',
-      img: '/images/pancita.png'
+      img: `${import.meta.env.BASE_URL}images/pancita.png`
     },
     {
       id: 4,
       name: 'Kuntur',
       desc: 'Cóndor',
-      img: '/images/mari.png'
+      img: `${import.meta.env.BASE_URL}images/mari.png`
     }
   ];
 
@@ -175,7 +175,7 @@ export const EjercicioIlustracionScreen: React.FC<Props> = ({ onNavigate }) => {
             <img
               alt="Kusi Alpaca"
               className="w-full h-full object-contain drop-shadow-md"
-              src="/images/pancita.png"
+              src={`${import.meta.env.BASE_URL}images/pancita.png`}
             />
           </div>
           <div className="flex-1">

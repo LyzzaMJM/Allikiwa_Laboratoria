@@ -123,7 +123,7 @@ export const EjercicioEmparejarScreen: React.FC<Props> = ({ onNavigate }) => {
               <img
                 alt="Kusi Alpaca"
                 className="w-full h-full object-contain filter drop-shadow-sm"
-                src="/images/pancita.png"
+                src={`${import.meta.env.BASE_URL}images/pancita.png`}
               />
             </div>
             <div>

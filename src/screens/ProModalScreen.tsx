@@ -57,7 +57,7 @@ export const ProModalScreen: React.FC<Props> = ({ onNavigate }) => {
               <img
                 alt="Allikiwa Icon"
                 className="w-8 h-8 rounded-lg object-contain"
-                src="/images/logo.png"
+                src={`${import.meta.env.BASE_URL}images/logo.png`}
               />
               <span className="font-display text-xl sm:text-2xl font-extrabold text-[#f27a21] tracking-tight">
                 Allikiwa
@@ -96,7 +96,7 @@ export const ProModalScreen: React.FC<Props> = ({ onNavigate }) => {
                 <img
                   alt="Pancita la mascota oficial de Allikiwa"
                   className="w-full h-full object-contain"
-                  src="/images/pancita.png"
+                  src={`${import.meta.env.BASE_URL}images/pancita.png`}
                 />
               </div>
             </div>
