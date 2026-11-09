@@ -1,0 +1,27 @@
+{
+  "idioma": "Quechua Chanka",
+  "variedad": "Ayacucho-Chanka",
+  "descripcion": "20 palabras básicas validadas con hablantes nativos de Quechua Chanka (Ayacucho, Huancavelica, Apurímac)",
+  "palabras": [
+    { "id": "q01", "quechua": "Allillanchu",         "espanol": "¿Estás bien?",          "fonetica": "a-lli-llan-chu",          "categoria": "saludo",     "audio": "audios/quechua/q01_allillanchu.mp3" },
+    { "id": "q02", "quechua": "Allillanmi",          "espanol": "Estoy bien",             "fonetica": "a-lli-llan-mi",           "categoria": "saludo",     "audio": "audios/quechua/q02_allillanmi.mp3" },
+    { "id": "q03", "quechua": "Imaynallan kashanki", "espanol": "¿Cómo estás?",           "fonetica": "i-may-na-llan ka-shan-ki","categoria": "saludo",     "audio": "audios/quechua/q03_imaynallan.mp3" },
+    { "id": "q04", "quechua": "Yaku",                "espanol": "Agua",                   "fonetica": "ya-ku",                   "categoria": "naturaleza", "audio": "audios/quechua/q04_yaku.mp3" },
+    { "id": "q05", "quechua": "Inti",                "espanol": "Sol",                    "fonetica": "in-ti",                   "categoria": "naturaleza", "audio": "audios/quechua/q05_inti.mp3" },
+    { "id": "q06", "quechua": "Allpa",               "espanol": "Tierra",                 "fonetica": "all-pa",                  "categoria": "naturaleza", "audio": "audios/quechua/q06_allpa.mp3" },
+    { "id": "q07", "quechua": "Wasi",                "espanol": "Casa",                   "fonetica": "wa-si",                   "categoria": "hogar",      "audio": "audios/quechua/q07_wasi.mp3" },
+    { "id": "q08", "quechua": "Mama",                "espanol": "Madre / Mamá",           "fonetica": "ma-ma",                   "categoria": "familia",    "audio": "audios/quechua/q08_mama.mp3" },
+    { "id": "q09", "quechua": "Tayta",               "espanol": "Padre / Papá",           "fonetica": "tay-ta",                  "categoria": "familia",    "audio": "audios/quechua/q09_tayta.mp3" },
+    { "id": "q10", "quechua": "Wawqi",               "espanol": "Hermano (de hombre)",    "fonetica": "waw-qi",                  "categoria": "familia",    "audio": "audios/quechua/q10_wawqi.mp3" },
+    { "id": "q11", "quechua": "Pana",                "espanol": "Hermana (de hombre)",    "fonetica": "pa-na",                   "categoria": "familia",    "audio": "audios/quechua/q11_pana.mp3" },
+    { "id": "q12", "quechua": "Urpi",                "espanol": "Paloma / Mi amor",       "fonetica": "ur-pi",                   "categoria": "afecto",     "audio": "audios/quechua/q12_urpi.mp3" },
+    { "id": "q13", "quechua": "Munay",               "espanol": "Amor / Querer",          "fonetica": "mu-nay",                  "categoria": "afecto",     "audio": "audios/quechua/q13_munay.mp3" },
+    { "id": "q14", "quechua": "Allin",               "espanol": "Bueno / Bien",           "fonetica": "a-llin",                  "categoria": "cualidad",   "audio": "audios/quechua/q14_allin.mp3" },
+    { "id": "q15", "quechua": "Mana",                "espanol": "No",                     "fonetica": "ma-na",                   "categoria": "basico",     "audio": "audios/quechua/q15_mana.mp3" },
+    { "id": "q16", "quechua": "Arí",                 "espanol": "Sí",                     "fonetica": "a-ri",                    "categoria": "basico",     "audio": "audios/quechua/q16_ari.mp3" },
+    { "id": "q17", "quechua": "Mikuy",               "espanol": "Comida / Comer",         "fonetica": "mi-kuy",                  "categoria": "cotidiano",  "audio": "audios/quechua/q17_mikuy.mp3" },
+    { "id": "q18", "quechua": "Puñuy",               "espanol": "Dormir / Sueño",         "fonetica": "pu-ñuy",                  "categoria": "cotidiano",  "audio": "audios/quechua/q18_punuy.mp3" },
+    { "id": "q19", "quechua": "Rumi",                "espanol": "Piedra",                 "fonetica": "ru-mi",                   "categoria": "naturaleza", "audio": "audios/quechua/q19_rumi.mp3" },
+    { "id": "q20", "quechua": "Sachay",              "espanol": "Árbol / Monte",          "fonetica": "sa-chay",                 "categoria": "naturaleza", "audio": "audios/quechua/q20_sachay.mp3" }
+  ]
+}

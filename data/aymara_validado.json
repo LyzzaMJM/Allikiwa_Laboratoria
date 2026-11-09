@@ -1,0 +1,27 @@
+{
+  "idioma": "Aymara",
+  "variedad": "Aymara Central (Puno-Altiplano)",
+  "descripcion": "20 palabras básicas validadas con hablantes nativos de Aymara (Puno, Moquegua, Tacna)",
+  "palabras": [
+    { "id": "a01", "aymara": "Kamisaraki",  "espanol": "¿Cómo estás?",           "fonetica": "ka-mi-sa-ra-ki", "categoria": "saludo",     "audio": "audios/aymara/a01_kamisaraki.mp3" },
+    { "id": "a02", "aymara": "Waliki",      "espanol": "Estoy bien / Bien",      "fonetica": "wa-li-ki",       "categoria": "saludo",     "audio": "audios/aymara/a02_waliki.mp3" },
+    { "id": "a03", "aymara": "Yuspagara",   "espanol": "Gracias",                "fonetica": "yus-pa-ga-ra",   "categoria": "saludo",     "audio": "audios/aymara/a03_yuspagara.mp3" },
+    { "id": "a04", "aymara": "Uma",         "espanol": "Agua",                   "fonetica": "u-ma",           "categoria": "naturaleza", "audio": "audios/aymara/a04_uma.mp3" },
+    { "id": "a05", "aymara": "Inti",        "espanol": "Sol",                    "fonetica": "in-ti",          "categoria": "naturaleza", "audio": "audios/aymara/a05_inti.mp3" },
+    { "id": "a06", "aymara": "Pacha",       "espanol": "Tierra / Tiempo / Universo","fonetica": "pa-cha",      "categoria": "naturaleza", "audio": "audios/aymara/a06_pacha.mp3" },
+    { "id": "a07", "aymara": "Uta",         "espanol": "Casa",                   "fonetica": "u-ta",           "categoria": "hogar",      "audio": "audios/aymara/a07_uta.mp3" },
+    { "id": "a08", "aymara": "Tayka",       "espanol": "Madre / Mamá",           "fonetica": "tay-ka",         "categoria": "familia",    "audio": "audios/aymara/a08_tayka.mp3" },
+    { "id": "a09", "aymara": "Awki",        "espanol": "Padre / Papá",           "fonetica": "aw-ki",          "categoria": "familia",    "audio": "audios/aymara/a09_awki.mp3" },
+    { "id": "a10", "aymara": "Kullaka",     "espanol": "Hermana",                "fonetica": "ku-lla-ka",      "categoria": "familia",    "audio": "audios/aymara/a10_kullaka.mp3" },
+    { "id": "a11", "aymara": "Jilata",      "espanol": "Hermano mayor",          "fonetica": "ji-la-ta",       "categoria": "familia",    "audio": "audios/aymara/a11_jilata.mp3" },
+    { "id": "a12", "aymara": "Munaña",      "espanol": "Amor / Querer",          "fonetica": "mu-na-ña",       "categoria": "afecto",     "audio": "audios/aymara/a12_munana.mp3" },
+    { "id": "a13", "aymara": "Suma",        "espanol": "Bueno / Lindo",          "fonetica": "su-ma",          "categoria": "cualidad",   "audio": "audios/aymara/a13_suma.mp3" },
+    { "id": "a14", "aymara": "Janiwa",      "espanol": "No",                     "fonetica": "ja-ni-wa",       "categoria": "basico",     "audio": "audios/aymara/a14_janiwa.mp3" },
+    { "id": "a15", "aymara": "Jisa",        "espanol": "Sí",                     "fonetica": "ji-sa",          "categoria": "basico",     "audio": "audios/aymara/a15_jisa.mp3" },
+    { "id": "a16", "aymara": "Manq'aña",    "espanol": "Comida / Comer",         "fonetica": "man-qa-ña",      "categoria": "cotidiano",  "audio": "audios/aymara/a16_manqana.mp3" },
+    { "id": "a17", "aymara": "Ikiña",       "espanol": "Dormir",                 "fonetica": "i-ki-ña",        "categoria": "cotidiano",  "audio": "audios/aymara/a17_ikina.mp3" },
+    { "id": "a18", "aymara": "Qala",        "espanol": "Piedra",                 "fonetica": "qa-la",          "categoria": "naturaleza", "audio": "audios/aymara/a18_qala.mp3" },
+    { "id": "a19", "aymara": "Quqa",        "espanol": "Planta / Hierba",        "fonetica": "qu-qa",          "categoria": "naturaleza", "audio": "audios/aymara/a19_quqa.mp3" },
+    { "id": "a20", "aymara": "Jaqi",        "espanol": "Persona / Gente",        "fonetica": "ja-qi",          "categoria": "sociedad",   "audio": "audios/aymara/a20_jaqi.mp3" }
+  ]
+}
