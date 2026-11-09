@@ -1,18 +1,41 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { ScreenId, TransitionType } from '../types';
+import { RecordingItem, ScreenId, TransitionType } from '../types';
 import { sounds } from '../utils/audio';
 import { translateText } from '../utils/dictionary';
 import { translateWithApi } from '../utils/nlpcloud';
+import { speechService } from '../services/speechService';
+import { PICTORIAL_CARDS } from '../data/pictorialCards';
+import { AppHeader } from '../components/AppHeader';
 
 interface Props {
   onNavigate: (screen: ScreenId, transition?: TransitionType) => void;
+  onSaveRecording?: (recording: RecordingItem) => void;
+  isVoiceMode?: boolean;
+  onToggleVoiceMode?: () => void;
 }
 
-const FREE_TRANSLATIONS_LIMIT = 50;
+const FREE_TRANSLATIONS_LIMIT = 15;
 
-export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
+export const TraductorScreen: React.FC<Props> = ({
+  onNavigate,
+  onSaveRecording,
+  isVoiceMode: propIsVoiceMode,
+  onToggleVoiceMode,
+}) => {
+  const [internalVoiceMode, setInternalVoiceMode] = useState(false);
+  const isVoiceMode = propIsVoiceMode !== undefined ? propIsVoiceMode : internalVoiceMode;
+
+  const toggleVoiceMode = () => {
+    sounds.playTap();
+    if (onToggleVoiceMode) {
+      onToggleVoiceMode();
+    } else {
+      setInternalVoiceMode((prev) => !prev);
+    }
+  };
   const [inputText, setInputText] = useState('');
   const [targetLang, setTargetLang] = useState<'chanka' | 'aimara'>('chanka');
+  const [voiceDirection, setVoiceDirection] = useState<'es-to-indigenous' | 'indigenous-to-es'>('es-to-indigenous');
   const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [speed, setSpeed] = useState<'normal' | 'slow'>('normal');
@@ -118,6 +141,73 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
     }
   };
 
+  const handleSelectPictorialCard = (card: typeof PICTORIAL_CARDS[0]) => {
+    sounds.playTap();
+    const cardData = targetLang === 'chanka' ? card.quechua : card.aimara;
+
+    if (voiceDirection === 'indigenous-to-es') {
+      // Hablante nativo quechua/aimara traduce hacia el español
+      setInputText(cardData.phrase);
+      setTranslationResult({
+        result: card.castellano.phrase,
+        phonetics: card.castellano.phonetic || '[traducción en español]',
+        note: `Traducción al español para facilitar comunicación con hispanohablantes: ${card.castellano.translation}`,
+      });
+      setHasTranslated(true);
+      sounds.playSuccess();
+      speechService.speak(card.castellano.phrase, 'castellano');
+    } else {
+      // Español hacia lengua originaria
+      setInputText(card.castellano.phrase);
+      setTranslationResult({
+        result: cardData.phrase,
+        phonetics: cardData.phonetic,
+        note: card.castellano.translation,
+      });
+      setHasTranslated(true);
+      sounds.playSuccess();
+      speechService.speak(cardData.phrase, targetLang === 'chanka' ? 'quechua' : 'aimara');
+    }
+  };
+
+  const handleSaveAndTranscribeCurrent = () => {
+    sounds.playSuccess();
+    const title = inputText.trim().slice(0, 30) || 'Frase oral';
+    const langLabel = targetLang === 'chanka' ? 'Quechua Chanka' : 'Aimara';
+    const newRec: RecordingItem = {
+      id: 'rec-' + Date.now(),
+      title: `Traducción: ${title}`,
+      description: currentTrans.note || `Traducción al ${langLabel}`,
+      date: 'Hoy, ' + new Date().toLocaleDateString('es-PE'),
+      community: targetLang === 'chanka' ? 'Comunidad Chanka' : 'Comunidad Altiplánica',
+      duration: '0:05',
+      durationSeconds: 5,
+      language: langLabel,
+      informant: 'Usuario Allikiwa',
+      transcriber: 'Sistema Fonético Allikiwa',
+      isUserRecording: true,
+      segments: [
+        {
+          id: 'seg-1',
+          timestamp: '00:01',
+          seconds: 1,
+          speaker: 'Hablante',
+          role: 'hablante',
+          originalText: inputText || 'Frase oral',
+          translatedText: currentTrans.result,
+          phonetics: currentTrans.phonetics,
+          culturalNote: currentTrans.note,
+          linguisticTag: targetLang === 'chanka' ? 'Chanka' : 'Aimara Central',
+        },
+      ],
+      tags: ['Traductor', langLabel, 'Voz y Texto'],
+    };
+    if (onSaveRecording) {
+      onSaveRecording(newRec);
+    }
+    onNavigate('transcriptor_pdf', 'push');
+  };
+
   // Handle audio file upload - tries to transcribe speech or simulates
   const processAudioFile = useCallback((file: File) => {
     setUploadedAudioName(file.name);
@@ -153,89 +243,45 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="bg-[#fbf7ee] text-[#332219] antialiased flex flex-col min-h-screen">
       {/* ================= TOP NAV BAR ================= */}
-      <header className="w-full bg-white border-b-2 border-[#e5e2da] sticky top-0 z-50">
-        <div className="w-full px-4 sm:px-6 md:px-10 max-w-7xl mx-auto flex justify-between items-center h-16 sm:h-20">
-          {/* Logo Allikiwa */}
-          <a
-            className="flex items-center gap-3 group cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              onNavigate('traductor', 'none');
-            }}
-            href="#allikiwa"
-          >
-            <img
-              src={`${import.meta.env.BASE_URL}images/logo.png`}
-              alt="Logo Allikiwa"
-              className="w-9 h-9 sm:w-11 sm:h-11 object-contain rounded-xl shadow-xs"
-            />
-            <div className="flex flex-col">
-              <span className="font-chubby text-xl sm:text-2xl font-extrabold text-[#f27a21] tracking-wide flex items-center gap-1.5 leading-tight">
-                Allikiwa
-                <span className="text-[9px] sm:text-[10px] uppercase px-2 py-0.5 rounded-full bg-[#fff3e8] text-[#f27a21] border border-[#f27a21]/30 font-extrabold tracking-wider">
-                  Perú
-                </span>
-              </span>
-              <span className="text-xs font-bold text-[#8c7e73] -mt-0.5 hidden sm:block">
-                Aprende, practica y conecta con nuestras lenguas
-              </span>
-            </div>
-          </a>
-
-          {/* Navigation Links */}
-          <nav className="flex items-center space-x-1 sm:space-x-2">
-            <a
-              className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl font-chubby text-sm sm:text-base font-bold flex items-center gap-1.5 sm:gap-2 bg-[#ebedfa] text-[#2a3691] border-2 border-[#2a3691]/30 shadow-sm transition-all cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('traductor', 'none');
-              }}
-              href="#traductor"
-            >
-              <span className="material-symbols-outlined text-[18px] sm:text-[22px]">g_translate</span>
-              <span>Traductor</span>
-            </a>
-            <a
-              className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl font-chubby text-sm sm:text-base font-bold text-[#7a6f66] hover:bg-[#f0ece1] hover:text-[#2a3691] transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('mapa_quechua', 'push');
-              }}
-              href="#aprender"
-            >
-              <span className="material-symbols-outlined text-[18px] sm:text-[22px]">school</span>
-              <span>Aprender</span>
-            </a>
-          </nav>
-
-          {/* Trailing Profile */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
+      <AppHeader
+        onNavigate={onNavigate}
+        rightContent={
+          <>
+            {/* Toggle Modo 100% Voz */}
             <button
-              className="hidden sm:flex border-2 border-[#d6d1c4] rounded-2xl px-3.5 py-2 bg-white hover:bg-[#fbf7ee] text-[#2a3691] font-chubby text-sm font-bold items-center gap-2 shadow-duo-neutral btn-3d"
-              title="Lenguas activas"
+              onClick={toggleVoiceMode}
+              className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl border-2 font-chubby text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer shadow-xs shrink-0 ${isVoiceMode
+                ? 'bg-[#3ca21d] text-white border-[#2d7d15] shadow-duo-green'
+                : 'bg-[#fff1ed] text-[#b43f1d] border-[#f27a21]/30 hover:border-[#f27a21] hover:bg-[#fff7f2]'
+                }`}
               type="button"
-              onClick={() => onNavigate('perfil_registro', 'push')}
+              title={isVoiceMode ? 'Desactivar Modo 100% Voz' : 'Activar Modo 100% Voz (No Alfabetizados)'}
             >
-              <span className="w-2.5 h-2.5 rounded-full bg-[#3ca21d] animate-pulse"></span>
-              <span>ES / AY / QUE</span>
+              <span className="material-symbols-outlined text-[16px] sm:text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                {isVoiceMode ? 'record_voice_over' : 'volume_up'}
+              </span>
+              <span className="hidden xs:inline">{isVoiceMode ? 'Modo Voz: Activo' : 'Modo 100% Voz'}</span>
+              <span className="xs:hidden">{isVoiceMode ? 'Voz ON' : 'Modo Voz'}</span>
+              <span className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${isVoiceMode ? 'bg-white animate-pulse' : 'bg-[#f27a21]'}`} />
             </button>
+
+            {/* Profile */}
             <button
               aria-label="Perfil y racha"
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#fdf2e9] border-2 border-[#f3d3bc] text-[#f27a21] flex items-center justify-center hover:bg-[#fff3e8] shadow-duo-neutral btn-3d cursor-pointer"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-[#fdf2e9] border-2 border-[#f3d3bc] text-[#f27a21] flex items-center justify-center hover:bg-[#fff3e8] shadow-duo-neutral btn-3d cursor-pointer shrink-0"
               type="button"
               onClick={() => {
                 sounds.playTap();
-                onNavigate('perfil_dinamico', 'push');
+                onNavigate('perfil', 'push');
               }}
             >
-              <span className="material-symbols-outlined text-[24px] sm:text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+              <span className="material-symbols-outlined text-[20px] sm:text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                 face_6
               </span>
             </button>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       {/* ================= MAIN CONTENT ================= */}
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 md:px-10 py-6 sm:py-7">
@@ -243,14 +289,8 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
         <section className="mb-6 sm:mb-7">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e9f7e5] border-2 border-[#3ca21d]/30 text-[#2d7d15] mb-3">
-                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  sparkles
-                </span>
-                <span className="font-chubby text-sm font-bold tracking-wide">¡Aprende y traduce jugando!</span>
-              </div>
               <h1 className="font-chubby text-2xl sm:text-4xl font-extrabold text-[#2a3691] tracking-tight">
-                Habla y siente nuestras lenguas originarias
+                Traduce y aprende nuestras lenguas originarias
               </h1>
               <p className="text-sm sm:text-lg font-bold text-[#73685f] mt-1 max-w-2xl">
                 Escribe o habla con tu voz para traducir entre español,{' '}
@@ -269,13 +309,22 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
                 100% Amigable
               </span>
               {/* Translation counter */}
-              <span className={`px-3 sm:px-4 py-2 rounded-2xl border-2 font-chubby text-xs sm:text-sm font-bold flex items-center gap-2 shadow-sm ${
-                remainingTranslations <= 1
-                  ? 'bg-[#fff3e8] border-[#f27a21]/40 text-[#c95c10]'
-                  : 'bg-white border-[#e5e2da] text-[#2a3691]'
-              }`}>
-                <span className="material-symbols-outlined text-[18px] sm:text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>translate</span>
-                {remainingTranslations === 0 ? '¡Límite alcanzado!' : `${remainingTranslations} traducc. gratis`}
+              <span className={`px-3 sm:px-4 py-2 rounded-2xl border-2 font-chubby text-xs sm:text-sm font-bold flex items-center gap-2 shadow-sm transition-colors ${remainingTranslations <= 1
+                ? 'bg-[#fff3e8] border-[#f27a21]/40 text-[#c95c10]'
+                : 'bg-white border-[#e5e2da] text-[#2a3691]'
+                }`}>
+                <span
+                  className="material-symbols-outlined text-[18px] sm:text-[20px]"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                  aria-hidden="true"
+                >
+                  translate
+                </span>
+
+                {remainingTranslations <= 0
+                  ? '¡Límite alcanzado!'
+                  : `${remainingTranslations} traducc. gratis`
+                }
               </span>
             </div>
           </div>
@@ -289,7 +338,7 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
                 <img src={`${import.meta.env.BASE_URL}images/pancita.png`} alt="Pancita" className="w-14 h-14 object-contain shrink-0" />
                 <div>
                   <div className="font-chubby text-base sm:text-lg font-extrabold text-[#2a3691]">
-                    ¡Usaste tus 5 traducciones gratis! 🎉
+                    ¡Usaste tus 15 traducciones gratis!
                   </div>
                   <p className="text-xs sm:text-sm text-[#73685f] font-semibold">
                     Obtén <strong className="text-[#f27a21]">Allikiwa Pro</strong> por S/ 20/mes y traduce sin límites.
@@ -317,294 +366,532 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
           </div>
         )}
 
-        {/* ================= TRANSLATOR DUAL CONTAINER ================= */}
-        <section
-          className={`bg-white rounded-[28px] sm:rounded-[32px] border-2 border-[#d6d1c4] shadow-duo-card overflow-hidden mb-8 sm:mb-10 ${
-            isFullscreen ? 'fixed inset-0 z-50 p-4 sm:p-8 overflow-y-auto bg-[#fbf7ee] rounded-none border-none' : ''
-          }`}
-          id="translator-main-container"
-        >
-          {/* Header Bar */}
-          <div className="p-4 sm:p-6 bg-[#fdfbf7] border-b-2 border-[#e5e2da]">
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#e5e2da]">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#3ca21d] animate-pulse"></span>
-                <span className="font-chubby text-xs sm:text-sm font-extrabold text-[#2a3691] uppercase tracking-wider">
-                  Estación de Traducción Intercultural
-                </span>
+        {/* ================= WORKSPACE: ADAPTIVE VOICE MODE vs STANDARD DUAL MODE ================= */}
+        {isVoiceMode ? (
+          <section className="bg-white rounded-[28px] sm:rounded-[32px] border-4 border-[#3ca21d]/40 shadow-duo-card overflow-hidden mb-8 sm:mb-10 p-5 sm:p-8 animate-in fade-in duration-200">
+            {/* Voice Mode Banner */}
+            <div className="bg-[#e9f7e5] rounded-2xl p-4 sm:p-5 border-2 border-[#3ca21d]/30 mb-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-3.5 text-center sm:text-left">
+                <div className="w-12 h-12 rounded-2xl bg-[#3ca21d] text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <span className="material-symbols-outlined text-[28px]">record_voice_over</span>
+                </div>
+                <div>
+                  <h3 className="font-chubby text-base sm:text-lg font-bold text-[#104b00]">
+                    Modo 100% Voz Activo (Comunidades Orales)
+                  </h3>
+                  <p className="text-xs sm:text-sm font-semibold text-[#2d7d15]">
+                    Presiona el micrófono grande y habla directamente, o elige una tarjeta ilustrada.
+                  </p>
+                </div>
               </div>
               <button
-                id="btn-toggle-fullscreen"
-                onClick={() => setIsFullscreen(!isFullscreen)}
-                className="btn-3d px-3 py-1.5 rounded-xl bg-[#ebedfa] hover:bg-[#2a3691] text-[#2a3691] hover:text-white border-2 border-[#2a3691]/30 font-chubby text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shadow-sm"
-                title="Modo Expandido / Pantalla Completa"
+                onClick={toggleVoiceMode}
+                className="px-4 py-2 rounded-xl bg-white border-2 border-[#3ca21d] text-[#104b00] font-chubby text-xs sm:text-sm font-bold hover:bg-[#d6f5cc] transition-colors cursor-pointer shadow-xs"
+                type="button"
               >
-                <span className="material-symbols-outlined text-[18px]">
-                  {isFullscreen ? 'fullscreen_exit' : 'fullscreen'}
-                </span>
-                <span className="hidden sm:inline">{isFullscreen ? 'Salir' : 'Pantalla Completa'}</span>
+                Volver a Modo Texto
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr] items-center gap-3 sm:gap-4">
-              {/* Input Language Box */}
-              <div className="flex items-center justify-between bg-white px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl border-2 border-[#e5e2da] shadow-sm">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#ebedfa] text-[#2a3691] flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-[18px] sm:text-[22px]">flag</span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-extrabold text-[#9c8e82] uppercase tracking-wider block">Idioma de entrada</span>
-                    <span className="font-chubby text-lg sm:text-xl font-bold text-[#2a3691]">Español</span>
-                  </div>
-                </div>
-                <span className="material-symbols-outlined text-[#3ca21d] text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  check_circle
-                </span>
-              </div>
-
-              {/* Swap/Arrow */}
-              <div className="flex justify-center">
+            {/* Target Language Toggle & Direction for Voice Mode */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+              {/* Selector de Lengua */}
+              <div className="inline-flex bg-[#f5f1ea] p-1.5 rounded-2xl border-2 border-[#ede8df] gap-1.5">
                 <button
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white text-[#2a3691] border-2 border-[#d6d1c4] hover:border-[#2a3691] hover:bg-[#ebedfa] flex items-center justify-center shadow-duo-neutral btn-3d"
-                  title="Cambiar idioma destino"
-                  type="button"
                   onClick={() => {
                     sounds.playTap();
-                    setTargetLang(targetLang === 'chanka' ? 'aimara' : 'chanka');
+                    setTargetLang('chanka');
                     setTranslationResult(null);
                   }}
+                  className={`px-3.5 sm:px-5 py-2 rounded-xl font-chubby text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer ${targetLang === 'chanka'
+                    ? 'bg-[#2a3691] text-white shadow-sm scale-102'
+                    : 'text-[#6b5f55] hover:text-[#2a3691]'
+                    }`}
+                  type="button"
                 >
-                  <span className="material-symbols-outlined text-[22px] sm:text-[26px]">swap_horiz</span>
+                  <span className="material-symbols-outlined text-[18px]">translate</span>
+                  <span>Quechua Chanka</span>
+                </button>
+                <button
+                  onClick={() => {
+                    sounds.playTap();
+                    setTargetLang('aimara');
+                    setTranslationResult(null);
+                  }}
+                  className={`px-3.5 sm:px-5 py-2 rounded-xl font-chubby text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer ${targetLang === 'aimara'
+                    ? 'bg-[#f27a21] text-white shadow-sm scale-102'
+                    : 'text-[#6b5f55] hover:text-[#f27a21]'
+                    }`}
+                  type="button"
+                >
+                  <span className="material-symbols-outlined text-[18px]">translate</span>
+                  <span>Aimara</span>
                 </button>
               </div>
 
-              {/* Target Language Selector */}
-              <div className="flex items-center justify-between bg-[#fff3e8]/50 px-4 sm:px-5 py-3 rounded-2xl border-2 border-[#f27a21]/40 shadow-sm">
-                <div className="flex items-center gap-2 sm:gap-3 flex-grow">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#f27a21] text-white flex items-center justify-center shadow-sm shrink-0">
-                    <span className="material-symbols-outlined text-[18px] sm:text-[22px]">record_voice_over</span>
+              {/* Selector de Dirección de Comunicación (Bilingüe) */}
+              <div className="inline-flex bg-white p-1 rounded-2xl border-2 border-[#ede8df] shadow-xs">
+                <button
+                  onClick={() => {
+                    sounds.playTap();
+                    setVoiceDirection('es-to-indigenous');
+                    setTranslationResult(null);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl font-chubby text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${voiceDirection === 'es-to-indigenous'
+                    ? 'bg-[#3ca21d] text-white shadow-xs'
+                    : 'text-[#6b5f55] hover:text-[#3ca21d]'
+                    }`}
+                  type="button"
+                  title="Hablar en Español y traducir a lengua originaria"
+                >
+                  <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                  <span>Español → {targetLang === 'chanka' ? 'Quechua' : 'Aimara'}</span>
+                </button>
+                <button
+                  onClick={() => {
+                    sounds.playTap();
+                    setVoiceDirection('indigenous-to-es');
+                    setTranslationResult(null);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl font-chubby text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${voiceDirection === 'indigenous-to-es'
+                    ? 'bg-[#0e1c7b] text-white shadow-xs'
+                    : 'text-[#6b5f55] hover:text-[#0e1c7b]'
+                    }`}
+                  type="button"
+                  title="Hablante nativo habla en su lengua y traduce al Español"
+                >
+                  <span className="material-symbols-outlined text-[16px]">record_voice_over</span>
+                  <span>{targetLang === 'chanka' ? 'Quechua' : 'Aimara'} → Español</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Giant Central Microphone Button */}
+            <div className="flex flex-col items-center justify-center my-6 sm:my-8 text-center">
+              <button
+                onClick={handleToggleVoiceInput}
+                type="button"
+                className={`w-32 h-32 sm:w-40 sm:h-40 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all duration-300 shadow-2xl relative group ${isListening
+                  ? 'bg-[#ba1a1a] text-white ring-8 ring-[#ba1a1a]/30 animate-pulse scale-105'
+                  : 'bg-gradient-to-tr from-[#2a3691] via-[#1a2260] to-[#3ca21d] text-white hover:scale-105 hover:shadow-duo-green'
+                  }`}
+                title="Toca para hablar"
+              >
+                <span className="material-symbols-outlined text-[48px] sm:text-[60px] mb-1">
+                  {isListening ? 'graphic_eq' : 'mic'}
+                </span>
+                <span className="font-chubby text-xs sm:text-sm font-bold uppercase tracking-wider">
+                  {isListening ? 'Escuchando...' : 'Toca y Habla'}
+                </span>
+              </button>
+              <p className="font-chubby text-sm sm:text-base font-bold text-[#6b5f55] mt-4 max-w-sm">
+                {isListening
+                  ? 'Di lo que necesites en español o en tu lengua originaria...'
+                  : 'Presiona el micrófono para hablar con tu propia voz'}
+              </p>
+            </div>
+
+            {/* Translation & Phonetics Result (if translated) */}
+            {hasTranslated && (
+              <div className="bg-[#fffcf5] border-2 border-[#f27a21]/40 rounded-3xl p-5 sm:p-6 mb-8 shadow-sm animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="px-3 py-1 rounded-full bg-[#e9f7e5] text-[#2d7d15] font-chubby text-xs font-bold flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[16px]">verified</span>
+                    {voiceDirection === 'indigenous-to-es' ? 'Traducción oral al Español' : `Traducción oral en ${langName}`}
+                  </span>
+                  <button
+                    onClick={() => {
+                      if (voiceDirection === 'indigenous-to-es') {
+                        speechService.speak(currentTrans.result, 'castellano');
+                      } else {
+                        handleListen();
+                      }
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-[#3ca21d] text-white font-chubby text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer hover:bg-[#2d7d15]"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">volume_up</span>
+                    <span>Repetir audio</span>
+                  </button>
+                </div>
+
+                <p className="font-chubby text-2xl sm:text-3xl font-extrabold text-[#2a3691] leading-snug mb-2">
+                  &ldquo;{currentTrans.result}&rdquo;
+                </p>
+
+                <div className="p-3 bg-white rounded-2xl border border-[#ede8df] flex items-center gap-2 mb-4">
+                  <span className="material-symbols-outlined text-[#f27a21] text-[20px]">hearing</span>
+                  <div>
+                    <span className="text-[11px] font-bold text-[#8c7e73] uppercase block">Pronunciación guiada</span>
+                    <span className="font-chubby text-sm sm:text-base font-bold text-[#f27a21]">
+                      {currentTrans.phonetics}
+                    </span>
                   </div>
-                  <div className="w-full">
-                    <span className="text-xs font-extrabold text-[#c95c10] uppercase tracking-wider block">Traducir a</span>
-                    <select
-                      className="bg-transparent font-chubby text-base sm:text-lg font-bold text-[#2a3691] border-none p-0 focus:ring-0 cursor-pointer w-full leading-tight"
-                      id="friendly-target-lang"
-                      value={targetLang}
-                      onChange={(e) => {
+                </div>
+
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={handleSaveAndTranscribeCurrent}
+                    className="px-4 py-2.5 rounded-xl bg-[#2a3691] text-white font-chubby text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-sm btn-3d cursor-pointer"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">edit_note</span>
+                    <span>Guardar en Transcriptor</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Quick Pictorial Cards (Tarjetas Temáticas con Dibujos) */}
+            <div className="mt-6 pt-6 border-t-2 border-[#ede8df]">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-chubby text-xs sm:text-sm font-extrabold text-[#2a3691] uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[18px] text-[#f27a21]">dashboard</span>
+                  Tarjetas Rápidas con Dibujos
+                </span>
+                <span className="text-xs font-bold text-[#8c7e73]">Toca para escuchar y traducir</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                {PICTORIAL_CARDS.slice(0, 5).map((card) => {
+                  const cardData = targetLang === 'chanka' ? card.quechua : card.aimara;
+                  return (
+                    <button
+                      key={card.id}
+                      onClick={() => handleSelectPictorialCard(card)}
+                      className="p-3.5 rounded-2xl border-2 border-[#ede8df] hover:border-[#f27a21] bg-[#fffcf5] hover:bg-white flex flex-col items-center justify-center text-center transition-all cursor-pointer shadow-xs group"
+                      type="button"
+                    >
+                      <div className="w-12 h-12 rounded-2xl bg-white border border-[#ede8df] flex items-center justify-center text-[24px] mb-2 shadow-xs group-hover:scale-110 transition-transform">
+                        {card.id === 'salud' && (
+                          <span className="material-symbols-outlined text-[#ba1a1a] text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            health_and_safety
+                          </span>
+                        )}
+                        {card.id === 'chacra' && (
+                          <span className="material-symbols-outlined text-[#3ca21d] text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            agriculture
+                          </span>
+                        )}
+                        {card.id === 'ayllu' && (
+                          <span className="material-symbols-outlined text-[#2a3691] text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            groups
+                          </span>
+                        )}
+                        {card.id === 'qhatu' && (
+                          <span className="material-symbols-outlined text-[#f27a21] text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            storefront
+                          </span>
+                        )}
+                        {card.id === 'auxilio' && (
+                          <span className="material-symbols-outlined text-[#d83a3a] text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            e911_emergency
+                          </span>
+                        )}
+                      </div>
+                      <span className="font-chubby text-xs font-bold text-[#2a3691] line-clamp-1">
+                        {voiceDirection === 'indigenous-to-es' ? card.castellano.title : cardData.title}
+                      </span>
+                      <span className="text-[10px] text-[#8c7e73] font-semibold mt-0.5 line-clamp-1">
+                        {voiceDirection === 'indigenous-to-es' ? cardData.title : card.castellano.title}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        ) : (
+          /* ================= STANDARD TRANSLATOR DUAL CONTAINER ================= */
+          <section
+            className={`bg-white rounded-[28px] sm:rounded-[32px] border-2 border-[#d6d1c4] shadow-duo-card overflow-hidden mb-8 sm:mb-10 ${isFullscreen ? 'fixed inset-0 z-50 p-4 sm:p-8 overflow-y-auto bg-[#fbf7ee] rounded-none border-none' : ''
+              }`}
+            id="translator-main-container"
+          >
+            {/* Header Bar */}
+            <div className="p-4 sm:p-6 bg-[#fdfbf7] border-b-2 border-[#e5e2da]">
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#e5e2da]">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-[#3ca21d] animate-pulse"></span>
+                  <span className="font-chubby text-xs sm:text-sm font-extrabold text-[#2a3691] uppercase tracking-wider">
+                    Estación de Traducción Intercultural
+                  </span>
+                </div>
+                <button
+                  id="btn-toggle-fullscreen"
+                  onClick={() => setIsFullscreen(!isFullscreen)}
+                  className="btn-3d px-3 py-1.5 rounded-xl bg-[#ebedfa] hover:bg-[#2a3691] text-[#2a3691] hover:text-white border-2 border-[#2a3691]/30 font-chubby text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                  title="Modo Expandido / Pantalla Completa"
+                >
+                  <span className="material-symbols-outlined text-[18px]">
+                    {isFullscreen ? 'fullscreen_exit' : 'fullscreen'}
+                  </span>
+                  <span className="hidden sm:inline">{isFullscreen ? 'Salir' : 'Pantalla Completa'}</span>
+                </button>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 bg-white p-3 sm:p-4 rounded-2xl border-2 border-[#e5e2da] shadow-xs">
+                {/* Input Language Indicator */}
+                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-[#ebedfa] text-[#2a3691] flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-[18px]">flag</span>
+                    </div>
+                    <span className="font-chubby text-sm sm:text-base font-bold text-[#2a3691]">
+                      Español
+                    </span>
+                  </div>
+                  <span className="material-symbols-outlined text-[#8c7e73] text-[20px]">
+                    arrow_forward
+                  </span>
+                </div>
+
+                {/* Single Clear Target Language Selector */}
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                  <span className="text-xs font-extrabold text-[#8c7e73] uppercase tracking-wider hidden md:inline">
+                    Traducir a:
+                  </span>
+                  <div className="inline-flex bg-[#f5f1ea] p-1 rounded-2xl border border-[#ede8df] gap-1 w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => {
                         sounds.playTap();
-                        setTargetLang(e.target.value as 'chanka' | 'aimara');
+                        setTargetLang('chanka');
                         setTranslationResult(null);
                       }}
+                      className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 rounded-xl font-chubby text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${targetLang === 'chanka'
+                        ? 'bg-[#2a3691] text-white shadow-xs'
+                        : 'text-[#6b5f55] hover:text-[#2a3691]'
+                        }`}
                     >
-                      <option value="chanka">Quechua Chanka (Ayacucho)</option>
-                      <option value="aimara">Aimara (Puno y Altiplano)</option>
-                    </select>
+                      <span>Quechua Chanka</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sounds.playTap();
+                        setTargetLang('aimara');
+                        setTranslationResult(null);
+                      }}
+                      className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 rounded-xl font-chubby text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${targetLang === 'aimara'
+                        ? 'bg-[#f27a21] text-white shadow-xs'
+                        : 'text-[#6b5f55] hover:text-[#f27a21]'
+                        }`}
+                    >
+                      <span>Aimara</span>
+                    </button>
                   </div>
                 </div>
-                <span className="material-symbols-outlined text-[#f27a21] text-[22px] pointer-events-none">expand_more</span>
               </div>
             </div>
-          </div>
 
-          {/* Interactive Translation Workspace */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y-2 lg:divide-y-0 lg:divide-x-2 divide-[#e5e2da]">
-            {/* Source Panel */}
-            <div className="p-5 sm:p-8 flex flex-col justify-between min-h-[300px] sm:min-h-[350px] bg-white">
-              <div>
-                <div className="flex justify-between items-center mb-3">
-                  <span className="font-chubby text-xs sm:text-sm font-bold text-[#94867a] uppercase tracking-wider flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[18px]">edit_note</span> Escribe o dicta aquí
-                  </span>
-                  <button
-                    className="text-[#94867a] hover:text-[#b43f1d] transition-colors flex items-center gap-1 font-bold text-sm px-2.5 py-1 rounded-xl hover:bg-[#b43f1d]/10 cursor-pointer"
-                    title="Borrar todo"
-                    type="button"
-                    onClick={() => {
-                      sounds.playTap();
-                      setInputText('');
-                      setTranslationResult(null);
-                      setHasTranslated(false);
-                    }}
-                  >
-                    <span className="material-symbols-outlined text-[18px]">delete</span>
-                    Borrar
-                  </button>
-                </div>
-                <textarea
-                  className="w-full bg-transparent border-0 resize-none font-bold text-lg sm:text-2xl text-[#2b201a] focus:ring-0 p-0 h-32 sm:h-40 leading-relaxed placeholder-[#c2b9af] focus:outline-none"
-                  id="input-friendly-text"
-                  placeholder="Escribe lo que quieras decir o presiona el botón de micrófono..."
-                  value={inputText}
-                  onChange={(e) => {
-                    setInputText(e.target.value);
-                    if (hasTranslated) setHasTranslated(false);
-                  }}
-                />
-              </div>
-
-              {/* Action Toolbar */}
-              <div className="pt-4 sm:pt-5 border-t-2 border-[#e5e2da] flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    className={`btn-3d px-3 sm:px-5 py-2 sm:py-3 rounded-2xl ${
-                      isListening ? 'bg-[#b43f1d] border-[#8a2b0e] animate-pulse' : 'bg-[#2a3691] border-[#1a2260]'
-                    } text-white border-b-4 shadow-duo-blue flex items-center gap-2 font-chubby cursor-pointer`}
-                    title="Presiona para hablar"
-                    type="button"
-                    onClick={handleToggleVoiceInput}
-                  >
-                    <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/20 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[18px] sm:text-[20px]">{isListening ? 'graphic_eq' : 'mic'}</span>
+            {/* Interactive Translation Workspace */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 divide-y-2 lg:divide-y-0 lg:divide-x-2 divide-[#e5e2da]">
+              {/* Source Panel */}
+              <div className="p-5 sm:p-8 flex flex-col justify-between min-h-[300px] sm:min-h-[350px] bg-white">
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="font-chubby text-xs sm:text-sm font-bold text-[#94867a] uppercase tracking-wider flex items-center gap-2">
+                      <span className="material-symbols-outlined text-[18px]">edit_note</span> Escribe o dicta aquí
                     </span>
-                    <div className="text-left leading-tight">
-                      <span className="font-bold text-sm sm:text-base block">{isListening ? 'Escuchando...' : 'Hablar'}</span>
-                      <span className="text-xs font-medium text-white/80 hidden sm:block">Dictado por voz</span>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      sounds.playTap();
-                      setIsAudioModalOpen(true);
+                    <button
+                      className="text-[#94867a] hover:text-[#b43f1d] transition-colors flex items-center gap-1 font-bold text-sm px-2.5 py-1 rounded-xl hover:bg-[#b43f1d]/10 cursor-pointer"
+                      title="Borrar todo"
+                      type="button"
+                      onClick={() => {
+                        sounds.playTap();
+                        setInputText('');
+                        setTranslationResult(null);
+                        setHasTranslated(false);
+                      }}
+                    >
+                      <span className="material-symbols-outlined text-[18px]">delete</span>
+                      Borrar
+                    </button>
+                  </div>
+                  <textarea
+                    className="w-full bg-transparent border-0 resize-none font-bold text-lg sm:text-2xl text-[#2b201a] focus:ring-0 p-0 h-32 sm:h-40 leading-relaxed placeholder-[#c2b9af] focus:outline-none"
+                    id="input-friendly-text"
+                    placeholder="Escribe lo que quieras decir o presiona el botón de micrófono..."
+                    value={inputText}
+                    onChange={(e) => {
+                      setInputText(e.target.value);
+                      if (hasTranslated) setHasTranslated(false);
                     }}
-                    className="btn-3d px-3 sm:px-5 py-2 sm:py-3 rounded-2xl bg-[#fdf2e9] hover:bg-[#fff3e8] text-[#f27a21] border-2 border-[#f27a21]/40 border-b-4 border-b-[#f27a21] shadow-duo-orange flex items-center gap-2 font-chubby transition-all cursor-pointer"
-                    title="Subir archivo de audio (MP3, WAV, Nota de voz)"
-                    type="button"
-                  >
-                    <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#f27a21] text-white flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[18px] sm:text-[20px]">upload_file</span>
-                    </span>
-                    <div className="text-left leading-tight">
-                      <span className="font-bold text-sm sm:text-base block text-[#f27a21]">Subir audio</span>
-                      <span className="text-xs font-semibold text-[#8a7d72] hidden sm:block">MP3 / WAV / Voz</span>
-                    </div>
-                  </button>
+                  />
                 </div>
 
-                <button
-                  className={`btn-3d px-5 sm:px-8 py-2.5 sm:py-3 rounded-2xl text-white border-b-4 flex items-center gap-2 font-chubby text-sm sm:text-lg font-bold cursor-pointer transition-all ${
-                    translationCount >= FREE_TRANSLATIONS_LIMIT
+                {/* Action Toolbar */}
+                <div className="pt-4 sm:pt-5 border-t-2 border-[#e5e2da] flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      className={`btn-3d px-3 sm:px-5 py-2 sm:py-3 rounded-2xl ${isListening ? 'bg-[#b43f1d] border-[#8a2b0e] animate-pulse' : 'bg-[#2a3691] border-[#1a2260]'
+                        } text-white border-b-4 shadow-duo-blue flex items-center gap-2 font-chubby cursor-pointer`}
+                      title="Presiona para hablar"
+                      type="button"
+                      onClick={handleToggleVoiceInput}
+                    >
+                      <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/20 flex items-center justify-center">
+                        <span className="material-symbols-outlined text-[18px] sm:text-[20px]">{isListening ? 'graphic_eq' : 'mic'}</span>
+                      </span>
+                      <div className="text-left leading-tight">
+                        <span className="font-bold text-sm sm:text-base block">{isListening ? 'Escuchando...' : 'Hablar'}</span>
+                        <span className="text-xs font-medium text-white/80 hidden sm:block">Dictado por voz</span>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        sounds.playTap();
+                        setIsAudioModalOpen(true);
+                      }}
+                      className="btn-3d px-3 sm:px-5 py-2 sm:py-3 rounded-2xl bg-[#fdf2e9] hover:bg-[#fff3e8] text-[#f27a21] border-2 border-[#f27a21]/40 border-b-4 border-b-[#f27a21] shadow-duo-orange flex items-center gap-2 font-chubby transition-all cursor-pointer"
+                      title="Subir archivo de audio (MP3, WAV, Nota de voz)"
+                      type="button"
+                    >
+                      <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#f27a21] text-white flex items-center justify-center">
+                        <span className="material-symbols-outlined text-[18px] sm:text-[20px]">upload_file</span>
+                      </span>
+                      <div className="text-left leading-tight">
+                        <span className="font-bold text-sm sm:text-base block text-[#f27a21]">Subir audio</span>
+                        <span className="text-xs font-semibold text-[#8a7d72] hidden sm:block">MP3 / WAV / Voz</span>
+                      </div>
+                    </button>
+                  </div>
+
+                  <button
+                    className={`btn-3d px-5 sm:px-8 py-2.5 sm:py-3 rounded-2xl text-white border-b-4 flex items-center gap-2 font-chubby text-sm sm:text-lg font-bold cursor-pointer transition-all ${translationCount >= FREE_TRANSLATIONS_LIMIT
                       ? 'bg-[#8c7e73] border-[#6b5f55] cursor-not-allowed'
                       : 'bg-[#f27a21] border-[#c95c10] shadow-duo-orange hover:brightness-105'
-                  }`}
-                  type="button"
-                  disabled={translationCount >= FREE_TRANSLATIONS_LIMIT && !inputText}
-                  onClick={() => {
-                    if (translationCount >= FREE_TRANSLATIONS_LIMIT) {
-                      onNavigate('pro_popup', 'slide_up');
-                    } else {
-                      handleTranslate();
-                    }
-                  }}
-                >
-                  <span className="material-symbols-outlined text-[20px] sm:text-[24px]">
-                    {translationCount >= FREE_TRANSLATIONS_LIMIT ? 'lock' : 'translate'}
-                  </span>
-                  <span>{translationCount >= FREE_TRANSLATIONS_LIMIT ? 'Activar Pro' : 'Traducir'}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Target Panel */}
-            <div className="p-5 sm:p-8 flex flex-col justify-between min-h-[300px] sm:min-h-[350px] bg-[#fdfcf9]">
-              <div>
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                  <span className="font-chubby text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full bg-[#e9f7e5] text-[#2d7d15] border-2 border-[#3ca21d]/30 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[16px] sm:text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      check_circle
-                    </span>
-                    {langName}
-                  </span>
-                  <span className="font-chubby text-xs font-bold text-[#f27a21] bg-[#fff3e8] px-3 py-1 rounded-full border border-[#f27a21]/30">
-                    ✨ Fonética guiada
-                  </span>
-                </div>
-
-                <div className={`font-chubby text-xl sm:text-3xl font-extrabold text-[#2a3691] leading-snug select-text mb-4 transition-all duration-300 ${hasTranslated ? 'opacity-100' : 'opacity-70'}`}>
-                  &ldquo;{currentTrans.result}&rdquo;
-                </div>
-
-                {/* Phonetics Card */}
-                <div className="bg-white p-3 sm:p-4 rounded-2xl border-2 border-[#d6d1c4] shadow-sm flex items-start gap-3">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#f27a21] text-white flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="material-symbols-outlined text-[18px] sm:text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      volume_up
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-chubby text-xs font-extrabold text-[#f27a21] uppercase tracking-wider block">
-                      ¿Cómo se pronuncia?
-                    </span>
-                    <p className="font-chubby text-sm sm:text-lg font-bold text-[#3d3129] mt-0.5 tracking-wide">
-                      &ldquo;{currentTrans.phonetics}&rdquo;
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Playback Toolbar */}
-              <div className="pt-4 sm:pt-5 border-t-2 border-[#e5e2da] flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                  <button
-                    className="btn-3d px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-[#3ca21d] text-white border-b-4 border-[#2d7d15] shadow-duo-green flex items-center gap-2 font-chubby text-sm sm:text-lg font-bold cursor-pointer"
-                    title="Escuchar pronunciación"
-                    type="button"
-                    onClick={handleListen}
-                  >
-                    <span className="material-symbols-outlined text-[20px] sm:text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      volume_up
-                    </span>
-                    <span>Escuchar</span>
-                  </button>
-
-                  <div className="flex items-center bg-white p-1 rounded-2xl border-2 border-[#d6d1c4] shadow-sm">
-                    <button
-                      className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl font-chubby text-xs sm:text-sm font-bold flex items-center gap-1 transition-all ${
-                        speed === 'normal' ? 'bg-[#2a3691] text-white shadow-sm' : 'text-[#7a6f66] hover:text-[#f27a21]'
                       }`}
-                      onClick={() => setSpeed('normal')}
-                    >
-                      <span>🔊 Normal</span>
-                    </button>
-                    <button
-                      className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl font-chubby text-xs sm:text-sm font-bold flex items-center gap-1 transition-all ${
-                        speed === 'slow' ? 'bg-[#f27a21] text-white shadow-sm' : 'text-[#7a6f66] hover:text-[#f27a21]'
-                      }`}
-                      onClick={() => setSpeed('slow')}
-                    >
-                      <span>🐢 Lento</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <button
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl border-2 border-[#e5e2da] bg-white text-[#70645a] hover:text-[#2a3691] hover:border-[#2a3691] flex items-center justify-center shadow-duo-neutral btn-3d cursor-pointer"
-                    title="Copiar texto"
                     type="button"
+                    disabled={translationCount >= FREE_TRANSLATIONS_LIMIT && !inputText}
                     onClick={() => {
-                      navigator.clipboard?.writeText(currentTrans.result);
-                      sounds.playSuccess();
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
+                      if (translationCount >= FREE_TRANSLATIONS_LIMIT) {
+                        onNavigate('pro_popup', 'slide_up');
+                      } else {
+                        handleTranslate();
+                      }
                     }}
                   >
-                    <span className="material-symbols-outlined text-[20px] sm:text-[22px]">{copied ? 'check' : 'content_copy'}</span>
-                  </button>
-                  <button
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl border-2 border-[#e5e2da] bg-white text-[#70645a] hover:text-[#f27a21] hover:border-[#f27a21] flex items-center justify-center shadow-duo-neutral btn-3d cursor-pointer"
-                    title="Guardar en favoritos"
-                    type="button"
-                    onClick={() => sounds.playSuccess()}
-                  >
-                    <span className="material-symbols-outlined text-[20px] sm:text-[22px]">bookmark</span>
+                    <span className="material-symbols-outlined text-[20px] sm:text-[24px]">
+                      {translationCount >= FREE_TRANSLATIONS_LIMIT ? 'lock' : 'translate'}
+                    </span>
+                    <span>{translationCount >= FREE_TRANSLATIONS_LIMIT ? 'Activar Pro' : 'Traducir'}</span>
                   </button>
                 </div>
               </div>
+
+              {/* Target Panel */}
+              <div className="p-5 sm:p-8 flex flex-col justify-between min-h-[300px] sm:min-h-[350px] bg-[#fdfcf9]">
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <span className="font-chubby text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full bg-[#e9f7e5] text-[#2d7d15] border-2 border-[#3ca21d]/30 flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[16px] sm:text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                      {langName}
+                    </span>
+                    <span className="font-chubby text-xs font-bold text-[#f27a21] bg-[#fff3e8] px-3 py-1 rounded-full border border-[#f27a21]/30">
+                      Fonética guiada
+                    </span>
+                  </div>
+
+                  <div className={`font-chubby text-xl sm:text-3xl font-extrabold text-[#2a3691] leading-snug select-text mb-4 transition-all duration-300 ${hasTranslated ? 'opacity-100' : 'opacity-70'}`}>
+                    &ldquo;{currentTrans.result}&rdquo;
+                  </div>
+
+                  {/* Phonetics Card */}
+                  <div className="bg-white p-3 sm:p-4 rounded-2xl border-2 border-[#d6d1c4] shadow-sm flex items-start gap-3">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#f27a21] text-white flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="material-symbols-outlined text-[18px] sm:text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        volume_up
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-chubby text-xs font-extrabold text-[#f27a21] uppercase tracking-wider block">
+                        ¿Cómo se pronuncia?
+                      </span>
+                      <p className="font-chubby text-sm sm:text-lg font-bold text-[#3d3129] mt-0.5 tracking-wide">
+                        &ldquo;{currentTrans.phonetics}&rdquo;
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Playback Toolbar */}
+                <div className="pt-4 sm:pt-5 border-t-2 border-[#e5e2da] flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <button
+                      className="btn-3d px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-[#3ca21d] text-white border-b-4 border-[#2d7d15] shadow-duo-green flex items-center gap-2 font-chubby text-sm sm:text-lg font-bold cursor-pointer"
+                      title="Escuchar pronunciación"
+                      type="button"
+                      onClick={handleListen}
+                    >
+                      <span className="material-symbols-outlined text-[20px] sm:text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        volume_up
+                      </span>
+                      <span>Escuchar</span>
+                    </button>
+
+                    <div className="flex items-center bg-white p-1 rounded-2xl border-2 border-[#d6d1c4] shadow-sm">
+                      <button
+                        className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl font-chubby text-xs sm:text-sm font-bold flex items-center gap-1 transition-all ${speed === 'normal' ? 'bg-[#2a3691] text-white shadow-sm' : 'text-[#7a6f66] hover:text-[#f27a21]'
+                          }`}
+                        onClick={() => setSpeed('normal')}
+                      >
+                        <span>Normal</span>
+                      </button>
+                      <button
+                        className={`px-2.5 sm:px-3.5 py-1.5 rounded-xl font-chubby text-xs sm:text-sm font-bold flex items-center gap-1 transition-all ${speed === 'slow' ? 'bg-[#f27a21] text-white shadow-sm' : 'text-[#7a6f66] hover:text-[#f27a21]'
+                          }`}
+                        onClick={() => setSpeed('slow')}
+                      >
+                        <span>Lento</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <button
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl border-2 border-[#e5e2da] bg-white text-[#70645a] hover:text-[#2a3691] hover:border-[#2a3691] flex items-center justify-center shadow-duo-neutral btn-3d cursor-pointer"
+                      title="Copiar texto"
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard?.writeText(currentTrans.result);
+                        sounds.playSuccess();
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                    >
+                      <span className="material-symbols-outlined text-[20px] sm:text-[22px]">{copied ? 'check' : 'content_copy'}</span>
+                    </button>
+                    <button
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl border-2 border-[#e5e2da] bg-white text-[#70645a] hover:text-[#f27a21] hover:border-[#f27a21] flex items-center justify-center shadow-duo-neutral btn-3d cursor-pointer"
+                      title="Guardar en favoritos"
+                      type="button"
+                      onClick={() => sounds.playSuccess()}
+                    >
+                      <span className="material-symbols-outlined text-[20px] sm:text-[22px]">bookmark</span>
+                    </button>
+                    {hasTranslated && (
+                      <button
+                        className="flex px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-[#2a3691] text-white border-b-4 border-[#1a2260] shadow-duo-blue items-center gap-1.5 sm:gap-2 font-chubby text-xs sm:text-sm font-bold btn-3d cursor-pointer hover:brightness-110 transition-all"
+                        title="Guardar grabación y abrir transcriptor"
+                        type="button"
+                        onClick={handleSaveAndTranscribeCurrent}
+                      >
+                        <span className="material-symbols-outlined text-[18px] sm:text-[20px]">edit_note</span>
+                        <span>Guardar y Transcribir</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* ================= CULTURAL CONTEXT & MASCOT ================= */}
         <section className="bg-white rounded-[28px] sm:rounded-[32px] border-2 border-[#d6d1c4] p-5 sm:p-9 shadow-duo-card mb-10 sm:mb-12 relative overflow-hidden">
@@ -671,9 +958,9 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
                 {/* Speech Bubble */}
                 <div className="relative bg-white border-2 border-[#3ca21d] rounded-3xl p-4 sm:p-5 shadow-duo-green mb-3 w-full text-center">
                   <p className="font-chubby text-base sm:text-xl font-bold text-[#2a3691] leading-tight">
-                    &ldquo;¡{targetLang === 'chanka' ? 'Allillanchu' : 'Kamisaraki'}! 👋 Estoy aquí para ayudarte a hablar {langName}.&rdquo;
+                    &ldquo;¡{targetLang === 'chanka' ? 'Allillanchu' : 'Kamisaraki'}! Estoy aquí para ayudarte a hablar {langName}.&rdquo;
                   </p>
-                  <p className="text-xs font-extrabold text-[#3ca21d] mt-1">— Tu amigo Pancita 🎉✨</p>
+                  <p className="text-xs font-extrabold text-[#3ca21d] mt-1">— Tu amigo Pancita</p>
                   <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-[#3ca21d]"></div>
                 </div>
 
@@ -714,7 +1001,7 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
               </div>
             </div>
             <span className="font-chubby text-xs sm:text-sm text-[#7a6f66] font-bold bg-white px-4 py-2 rounded-2xl border-2 border-[#e5e2da] self-start md:self-auto shadow-sm">
-              ✨ Nuevas incorporaciones
+              Nuevas incorporaciones
             </span>
           </div>
 
@@ -801,11 +1088,10 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
 
             {/* Drop Zone */}
             <div
-              className={`mt-5 sm:mt-6 border-2 border-dashed rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all group ${
-                isDraggingAudio
-                  ? 'border-[#f27a21] bg-[#fff3e8]/60 scale-[1.02]'
-                  : 'border-[#f27a21]/50 hover:border-[#f27a21] bg-[#fffcf5] hover:bg-[#fff3e8]/40'
-              }`}
+              className={`mt-5 sm:mt-6 border-2 border-dashed rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all group ${isDraggingAudio
+                ? 'border-[#f27a21] bg-[#fff3e8]/60 scale-[1.02]'
+                : 'border-[#f27a21]/50 hover:border-[#f27a21] bg-[#fffcf5] hover:bg-[#fff3e8]/40'
+                }`}
               onClick={() => audioFileRef.current?.click()}
               onDragOver={(e) => { e.preventDefault(); setIsDraggingAudio(true); }}
               onDragLeave={() => setIsDraggingAudio(false)}
@@ -839,10 +1125,10 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-2">
                     <span className="px-3 py-1 rounded-full bg-white border border-[#e5e2da] text-xs font-bold text-[#2a3691]">
-                      ✨ Auto-transcripción
+                      Auto-transcripción
                     </span>
                     <span className="px-3 py-1 rounded-full bg-white border border-[#e5e2da] text-xs font-bold text-[#3ca21d]">
-                      🎧 Detección fonética
+                      Detección fonética
                     </span>
                   </div>
                 </>
@@ -886,13 +1172,13 @@ export const TraductorScreen: React.FC<Props> = ({ onNavigate }) => {
       )}
 
       {/* ================= FOOTER ================= */}
-      <footer className="w-full bg-white border-t-2 border-[#e5e2da] mt-auto">
+      <footer className="w-full bg-white border-t-2 border-[#e5e2da] mt-auto pb-20 sm:pb-24">
         <div className="w-full px-4 sm:px-6 md:px-12 py-6 sm:py-8 max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-5">
           <div className="flex items-center gap-3">
             <img src={`${import.meta.env.BASE_URL}images/logo.png`} alt="Allikiwa" className="w-8 h-8 object-contain" />
             <div className="text-[#7a6f66] text-sm text-center md:text-left">
               <p className="font-chubby font-bold text-sm sm:text-base text-[#2a3691] mb-0.5">Allikiwa — Lenguas Originarias del Perú</p>
-              <p className="font-medium text-xs sm:text-sm">© 2025 Allikiwa. Preservando el Quechua Chanka • Aimara.</p>
+              <p className="font-medium text-xs sm:text-sm">© 2026 Allikiwa. Preservando el Quechua Chanka • Aimara.</p>
             </div>
           </div>
           <nav className="flex flex-wrap justify-center items-center gap-3 sm:gap-5 font-chubby text-xs sm:text-sm font-bold">

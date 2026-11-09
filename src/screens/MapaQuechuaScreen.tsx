@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScreenId, TransitionType } from '../types';
 import { sounds } from '../utils/audio';
+import { AppHeader } from '../components/AppHeader';
 
 interface Props {
   onNavigate: (screen: ScreenId, transition?: TransitionType) => void;
@@ -10,89 +11,38 @@ export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="bg-[#fff8f6] text-[#3b0900] font-body-md antialiased min-h-screen flex flex-col selection:bg-[#ffdbc9]">
       {/* ==================== TOP NAV BAR ==================== */}
-      <header className="bg-white border-b border-[#ffe9e4] shadow-sm sticky top-0 z-50">
-        <div className="flex justify-between items-center w-full px-4 md:px-10 max-w-[1200px] mx-auto h-20">
-          {/* Logo brand and slogan */}
-          <div className="flex items-center gap-3">
-            <a
-              className="flex items-center gap-3 group cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('traductor', 'push_back');
-              }}
-              href="#traductor"
-            >
-              <img
-                alt="Logo Allikiwa"
-                className="w-12 h-12 object-contain rounded-2xl p-0.5 border-2 border-[#2a3691]/10 shadow-xs transition-transform group-hover:scale-105 duration-200"
-                src={`${import.meta.env.BASE_URL}images/logo.png`}
-              />
-              <div className="flex flex-col">
-                <span className="font-playful text-2xl md:text-3xl font-bold tracking-tight text-[#f27a21] leading-tight">
-                  Allikiwa
-                </span>
-                <span className="text-[10px] md:text-xs font-semibold text-[#0e1c7b] hidden sm:block">
-                  Aprende, practica y conecta con nuestras lenguas
-                </span>
-              </div>
-            </a>
-          </div>
-
-          {/* Navigation Links (Traductor vs Aprender) */}
-          <nav className="flex items-center gap-6 sm:gap-8">
-            {/* XPath: //nav//a[contains(., 'Traductor')] */}
-            <a
-              className="text-[#454652] font-semibold text-sm sm:text-base hover:text-[#0e1c7b] transition-colors flex items-center gap-1.5 pb-1 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('traductor', 'push_back');
-              }}
-              href="#traductor"
-            >
-              <span className="material-symbols-outlined text-xl">translate</span>
-              <span>Traductor</span>
-            </a>
-            <a
-              className="border-b-2 border-[#0e1c7b] text-[#0e1c7b] font-bold text-sm sm:text-base pb-1 flex items-center gap-1.5 cursor-pointer"
-              href="#aprender"
-            >
-              <span className="material-symbols-outlined text-xl font-variation-fill">school</span>
-              <span>Aprender</span>
-            </a>
-          </nav>
-
-          {/* Gamified Status Counters & Profile */}
-          <div className="flex items-center gap-2 sm:gap-4">
+      <AppHeader
+        onNavigate={onNavigate}
+        rightContent={
+          <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Streak */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
-              <span className="material-symbols-outlined text-[#f27a21] font-variation-fill text-xl md:text-2xl">
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
+              <span className="material-symbols-outlined text-[#f27a21] font-variation-fill text-lg sm:text-xl">
                 local_fire_department
               </span>
-              <span className="font-bold text-sm md:text-base text-[#9a4600]">5</span>
-              <span className="text-[11px] font-semibold text-[#9a4600] hidden lg:inline">días</span>
+              <span className="font-bold text-xs sm:text-sm text-[#9a4600]">5</span>
+              <span className="text-[10px] font-semibold text-[#9a4600] hidden md:inline">días</span>
             </div>
 
             {/* Crystals */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
-              <span className="material-symbols-outlined text-[#1cb0f6] font-variation-fill text-xl md:text-2xl">
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
+              <span className="material-symbols-outlined text-[#1cb0f6] font-variation-fill text-lg sm:text-xl">
                 diamond
               </span>
-              <span className="font-bold text-sm md:text-base text-[#0e1c7b]">480</span>
+              <span className="font-bold text-xs sm:text-sm text-[#0e1c7b]">480</span>
             </div>
 
             {/* Hearts */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
-              <span className="material-symbols-outlined text-[#ff4b4b] font-variation-fill text-xl md:text-2xl">
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
+              <span className="material-symbols-outlined text-[#ff4b4b] font-variation-fill text-lg sm:text-xl">
                 favorite
               </span>
-              <span className="font-bold text-sm md:text-base text-[#d83a3a]">5/5</span>
+              <span className="font-bold text-xs sm:text-sm text-[#d83a3a]">5/5</span>
             </div>
 
-            {/* Navigation Target: //header//a[contains(@href, '#') and .//span[contains(text(), 'person')]] */}
+            {/* Profile Avatar */}
             <a
-              className="ml-1 p-1 rounded-full border-2 border-[#f27a21] hover:shadow-md transition-all cursor-pointer"
+              className="ml-0.5 p-0.5 sm:p-1 rounded-full border-2 border-[#f27a21] hover:shadow-md transition-all cursor-pointer shrink-0"
               href="#perfil"
               onClick={(e) => {
                 e.preventDefault();
@@ -101,13 +51,13 @@ export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate }) => {
               }}
               title="Mi Perfil"
             >
-              <div className="w-9 h-9 rounded-full bg-[#2a3691] text-white flex items-center justify-center font-bold text-sm shadow-inner overflow-hidden">
-                <span className="material-symbols-outlined text-xl">person</span>
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#2a3691] text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-inner overflow-hidden">
+                <span className="material-symbols-outlined text-lg sm:text-xl">person</span>
               </div>
             </a>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* ==================== MAIN CONTENT CANVAS ==================== */}
       <main className="flex-grow w-full max-w-[1200px] mx-auto px-4 md:px-10 py-6">
@@ -283,7 +233,7 @@ export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate }) => {
                 <div className="absolute -right-2 sm:right-6 md:-right-4 -top-16 z-30 flex flex-col items-center group pointer-events-none">
                   <div className="relative bg-white text-[#0e1c7b] border-2 border-[#ff842c] rounded-2xl px-3 py-2 shadow-md font-bold text-xs max-w-[150px] mb-1.5 text-center leading-snug">
                     ¡Vamos por la lección 3!<br />
-                    <span className="text-[#f27a21]">¡Tú puedes!</span> 💪
+                    <span className="text-[#f27a21]">¡Tú puedes!</span>
                     <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-b-2 border-r-2 border-[#ff842c] transform rotate-45"></div>
                   </div>
                   <img
@@ -508,7 +458,7 @@ export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate }) => {
           <div className="flex flex-col items-center md:items-start gap-1 text-center md:text-left">
             <span className="font-bold text-[#9a4600]">Allikiwa</span>
             <p className="text-xs text-[#454652]">
-              © 2024 Allikiwa. Promoviendo el Quechua Chanka y Aimara. Todos los derechos reservados.
+              © 2026 Allikiwa. Promoviendo el Quechua Chanka y Aimara. Todos los derechos reservados.
             </p>
           </div>
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-semibold text-[#454652]">

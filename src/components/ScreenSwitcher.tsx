@@ -17,7 +17,9 @@ const SCREENS: { id: ScreenId; label: string; number: number }[] = [
   { id: 'ejercicio_ilustracion', label: '8. Ejercicio: Elegir la Ilustración Correcta', number: 8 },
   { id: 'ejercicio_emparejar', label: '9. Ejercicio: Emparejar Pares', number: 9 },
   { id: 'ejercicio_dictado', label: '10. Ejercicio: Dictado y Fonética por Voz', number: 10 },
-  { id: 'cuaderno_repaso', label: '11. Cuaderno de Repaso y Fonética', number: 11 }
+  { id: 'cuaderno_repaso', label: '11. Cuaderno de Repaso y Fonética', number: 11 },
+  { id: 'voz_accesible', label: '12. Modo Accesible 100% Voz (No Alfabetizados)', number: 12 },
+  { id: 'transcriptor_pdf', label: '13. Grabaciones y Transcriptor (Exportar PDF)', number: 13 },
 ];
 
 export const ScreenSwitcher: React.FC<Props> = ({ currentScreen, onSelect }) => {
@@ -46,7 +48,7 @@ export const ScreenSwitcher: React.FC<Props> = ({ currentScreen, onSelect }) => 
           <div className="absolute bottom-12 left-0 w-80 bg-white rounded-3xl p-3 shadow-2xl border-2 border-[#ede8df] max-h-96 overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-150">
             <div className="flex justify-between items-center px-2 py-1 mb-2 border-b border-[#ffe9e4]">
               <span className="text-[11px] font-bold text-[#767683] uppercase tracking-wider">
-                11 Pantallas del Prototipo
+                13 Pantallas del Prototipo
               </span>
               <span className="text-[10px] bg-[#dfe0ff] text-[#0e1c7b] font-extrabold px-2 py-0.5 rounded-full">
                 Allikiwa

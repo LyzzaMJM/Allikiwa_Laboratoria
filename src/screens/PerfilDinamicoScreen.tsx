@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ScreenId, TransitionType } from '../types';
 import { sounds } from '../utils/audio';
+import { AppHeader } from '../components/AppHeader';
 
 interface Props {
   onNavigate: (screen: ScreenId, transition?: TransitionType) => void;
@@ -40,82 +41,33 @@ export const PerfilDinamicoScreen: React.FC<Props> = ({ onNavigate }) => {
       )}
 
       {/* TOP APP BAR */}
-      <header className="w-full bg-white shadow-sm border-b border-[#ede8df] sticky top-0 z-50">
-        <div className="flex justify-between items-center w-full px-4 md:px-10 max-w-[1200px] mx-auto h-20">
-          <div className="flex items-center gap-3">
-            <a
-              className="flex items-center gap-2 group cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('traductor', 'push_back');
-              }}
-              href="#traductor"
-            >
-              <img
-                alt="Logo Allikiwa"
-                className="w-12 h-12 object-contain rounded-2xl drop-shadow-sm group-hover:rotate-6 transition-transform duration-200"
-                src={`${import.meta.env.BASE_URL}images/logo.png`}
-              />
-              <span className="font-display text-[26px] font-bold text-[#f27a21] tracking-tight">Allikiwa</span>
-            </a>
-            <div className="hidden lg:block h-6 w-[2px] bg-[#c6c5d4]/30 mx-1"></div>
-            <span className="hidden lg:inline-block font-body-sm font-semibold text-[#454652] text-xs max-w-[260px] leading-tight">
-              Aprende, practica y conecta con nuestras lenguas
-            </span>
-          </div>
-
-          {/* Navigation Links: SPEC targets */}
-          <nav className="flex items-center gap-6 sm:gap-8">
-            <a
-              className="text-[#454652] font-semibold text-sm sm:text-base hover:text-[#0e1c7b] transition-colors flex items-center gap-1.5 py-1 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('traductor', 'push_back');
-              }}
-              href="#traductor"
-            >
-              <span className="material-symbols-outlined text-[20px]">translate</span>
-              <span>Traductor</span>
-            </a>
-            <a
-              className="text-[#454652] font-semibold text-sm sm:text-base hover:text-[#0e1c7b] transition-colors flex items-center gap-1.5 py-1 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('mapa_quechua', 'push');
-              }}
-              href="#aprender"
-            >
-              <span className="material-symbols-outlined text-[20px]">school</span>
-              <span>Aprender</span>
-            </a>
-          </nav>
-
-          {/* Trailing Active Stats */}
-          <div className="flex items-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold bg-[#ffe2db] text-[#9a4600]">
-              <span className="material-symbols-outlined material-symbols-fill text-[#f27a21] text-[20px]">
+      <AppHeader
+        onNavigate={onNavigate}
+        rightContent={
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-bold bg-[#ffe2db] text-[#9a4600] border border-[#ffd2c7]">
+              <span className="material-symbols-outlined text-[#f27a21] text-[18px] sm:text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                 local_fire_department
               </span>
-              <span className="text-sm font-black text-[#9a4600]">{isLoggedIn ? '5' : '0'}</span>
+              <span className="text-xs sm:text-sm font-black text-[#9a4600]">{isLoggedIn ? '5' : '0'}</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold bg-[#eef3ff] text-[#2a3691] border border-[#d6e2ff]">
-              <span className="material-symbols-outlined material-symbols-fill text-[#2a3691] text-[18px]">diamond</span>
-              <span className="text-sm font-black text-[#2a3691]">{isLoggedIn ? '320' : '0'}</span>
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full font-bold bg-[#eef3ff] text-[#2a3691] border border-[#d6e2ff]">
+              <span className="material-symbols-outlined text-[#2a3691] text-[16px] sm:text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                diamond
+              </span>
+              <span className="text-xs sm:text-sm font-black text-[#2a3691]">{isLoggedIn ? '320' : '0'}</span>
             </div>
-            <div className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full border border-[#ede8df] bg-[#fff8f6]">
+            <div className="flex items-center gap-1.5 sm:gap-2 pl-1.5 sm:pl-2 pr-1 py-1 rounded-full border border-[#ede8df] bg-[#fff8f6]">
               <div className="w-8 h-8 rounded-full bg-[#ff842c] text-white flex items-center justify-center font-bold text-xs shadow-sm">
                 <span className="material-symbols-outlined text-sm">person</span>
               </div>
-              <span className="text-sm font-bold text-[#0e1c7b] hidden sm:inline">
+              <span className="text-xs sm:text-sm font-bold text-[#0e1c7b] hidden sm:inline">
                 {isLoggedIn ? userName.split(' ')[0] : 'Invitado'}
               </span>
             </div>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* MAIN CANVAS */}
       <main className="flex-grow max-w-[1200px] w-full mx-auto px-4 md:px-10 py-6 md:py-10">
@@ -147,7 +99,7 @@ export const PerfilDinamicoScreen: React.FC<Props> = ({ onNavigate }) => {
             </button>
             <span className="px-3 py-1 bg-white/90 text-[#2a3691] text-xs rounded-full border border-[#2a3691]/20 font-bold uppercase tracking-wider hidden sm:flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-[#3ca21d] animate-pulse"></span>
-              PLATAFORMA ABIERTA 2024
+              PLATAFORMA ABIERTA 2026
             </span>
           </div>
         </div>
@@ -197,9 +149,8 @@ export const PerfilDinamicoScreen: React.FC<Props> = ({ onNavigate }) => {
                       <button
                         type="button"
                         onClick={() => setUserLang('quechua')}
-                        className={`p-3 rounded-2xl border-2 text-left flex items-center gap-2 cursor-pointer ${
-                          userLang === 'quechua' ? 'border-[#2a3691] bg-[#ebedfa]' : 'border-[#ede8df]'
-                        }`}
+                        className={`p-3 rounded-2xl border-2 text-left flex items-center gap-2 cursor-pointer ${userLang === 'quechua' ? 'border-[#2a3691] bg-[#ebedfa]' : 'border-[#ede8df]'
+                          }`}
                       >
                         <span className="w-8 h-8 rounded-xl bg-[#2a3691] text-white flex items-center justify-center font-bold text-xs">
                           Q
@@ -212,9 +163,8 @@ export const PerfilDinamicoScreen: React.FC<Props> = ({ onNavigate }) => {
                       <button
                         type="button"
                         onClick={() => setUserLang('aimara')}
-                        className={`p-3 rounded-2xl border-2 text-left flex items-center gap-2 cursor-pointer ${
-                          userLang === 'aimara' ? 'border-[#3ca21d] bg-[#e9f7e5]' : 'border-[#ede8df]'
-                        }`}
+                        className={`p-3 rounded-2xl border-2 text-left flex items-center gap-2 cursor-pointer ${userLang === 'aimara' ? 'border-[#3ca21d] bg-[#e9f7e5]' : 'border-[#ede8df]'
+                          }`}
                       >
                         <span className="w-8 h-8 rounded-xl bg-[#3ca21d] text-white flex items-center justify-center font-bold text-xs">
                           A

@@ -44,7 +44,7 @@ export const ProModalScreen: React.FC<Props> = ({ onNavigate }) => {
             className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-[#fff1ed] hover:bg-[#ffe9e4] text-[#454652] hover:text-[#3b0900] flex items-center justify-center transition-all duration-150 active:scale-95 shadow-sm cursor-pointer"
             onClick={() => {
               sounds.playTap();
-              onNavigate('traductor', 'push_back');
+              onNavigate('perfil_dinamico', 'push');
             }}
             type="button"
           >
@@ -106,7 +106,7 @@ export const ProModalScreen: React.FC<Props> = ({ onNavigate }) => {
               ¡Aprende y traduce sin límites!
             </h2>
             <p className="text-sm sm:text-base text-[#454652] max-w-[480px] mb-5">
-              Supera las 5 traducciones mensuales. Desbloquea sabiduría infinita en{' '}
+              Supera las 15 traducciones mensuales. Desbloquea sabiduría infinita en{' '}
               <strong className="text-[#0e1c7b] font-semibold">Quechua Chanka</strong> y{' '}
               <strong className="text-[#083200] font-semibold">Aimara</strong> con pronunciación de hablantes nativos.
             </p>
@@ -126,7 +126,7 @@ export const ProModalScreen: React.FC<Props> = ({ onNavigate }) => {
                   <ul className="space-y-2 text-[#454652] text-xs sm:text-sm">
                     <li className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-[18px]">check</span>
-                      <span>5 traducciones gratis al mes</span>
+                      <span>15 traducciones gratis al mes</span>
                     </li>
                     <li className="flex items-center gap-2 text-[#454652]/80">
                       <span className="material-symbols-outlined text-[18px] text-[#767683]">volume_down</span>
@@ -233,10 +233,10 @@ export const ProModalScreen: React.FC<Props> = ({ onNavigate }) => {
               type="button"
               onClick={() => {
                 sounds.playTap();
-                onNavigate('traductor', 'push_back');
+                onNavigate('perfil_dinamico', 'push');
               }}
             >
-              Continuar con 5 traducciones gratis cada mes
+              Continuar con 15 traducciones gratis cada mes
             </button>
 
             {/* Garantía */}

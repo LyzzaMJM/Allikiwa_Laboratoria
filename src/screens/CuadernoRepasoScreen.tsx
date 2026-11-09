@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ScreenId, TransitionType } from '../types';
 import { sounds } from '../utils/audio';
+import { AppHeader } from '../components/AppHeader';
 
 interface Props {
   onNavigate: (screen: ScreenId, transition?: TransitionType) => void;
@@ -54,82 +55,25 @@ export const CuadernoRepasoScreen: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="bg-[#fff8f6] text-[#3b0900] min-h-screen flex flex-col font-body-md antialiased selection:bg-[#ffdbc9]">
       {/* TopNavBar */}
-      <header className="bg-white border-b border-[#ffe9e4] shadow-sm sticky top-0 z-50">
-        <div className="flex justify-between items-center w-full px-4 md:px-10 max-w-[1200px] mx-auto h-16">
-          <div className="flex items-center gap-3">
-            <a
-              className="flex items-center gap-2 group cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('traductor', 'push_back');
-              }}
-              href="#traductor"
-            >
-              <img
-                alt="Logo Allikiwa"
-                className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
-                src={`${import.meta.env.BASE_URL}images/logo.png`}
-              />
-              <div className="flex flex-col">
-                <span className="font-display text-xl font-bold text-[#f27a21] leading-none">Allikiwa</span>
-                <span className="text-[10px] text-[#454652] hidden lg:inline-block mt-0.5">
-                  Aprende, practica y conecta con nuestras lenguas
-                </span>
-              </div>
-            </a>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="flex items-center gap-6 sm:gap-8">
-            {/* Target: //nav//a[contains(., 'Traductor')] */}
-            <a
-              className="text-[#454652] text-sm sm:text-base font-semibold hover:text-[#0e1c7b] transition-colors flex items-center gap-1.5 pb-1 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('traductor', 'push_back');
-              }}
-              href="#traductor"
-            >
-              <span className="material-symbols-outlined text-lg">g_translate</span>
-              <span>Traductor</span>
-            </a>
-
-            {/* Target: //nav//a[contains(., 'Aprender')] */}
-            <a
-              className="border-b-2 border-[#0e1c7b] text-[#0e1c7b] font-bold text-sm sm:text-base pb-1 flex items-center gap-1.5 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('mapa_quechua', 'push_back');
-              }}
-              href="#aprender"
-            >
-              <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
-                menu_book
-              </span>
-              <span>Aprender</span>
-            </a>
-          </nav>
-
-          {/* Trailing Badges & Profile */}
-          <div className="flex items-center gap-2 sm:gap-4">
-            <div className="flex items-center gap-1.5 bg-[#fff1ed] px-3 py-1.5 rounded-full border border-[#ffdbc9]">
-              <span className="material-symbols-outlined text-[#ff842c] text-lg font-variation-fill">
+      <AppHeader
+        onNavigate={onNavigate}
+        rightContent={
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            <div className="flex items-center gap-1 sm:gap-1.5 bg-[#fff1ed] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#ffdbc9]">
+              <span className="material-symbols-outlined text-[#ff842c] text-base sm:text-lg font-variation-fill">
                 local_fire_department
               </span>
-              <span className="font-bold text-sm text-[#9a4600]">5</span>
+              <span className="font-bold text-xs sm:text-sm text-[#9a4600]">5</span>
             </div>
 
-            <div className="flex items-center gap-1.5 bg-[#fff1ed] px-3 py-1.5 rounded-full border border-[#dfe0ff]">
-              <span className="material-symbols-outlined text-[#2a3691] text-lg font-variation-fill">diamond</span>
-              <span className="font-bold text-sm text-[#0e1c7b]">480</span>
+            <div className="flex items-center gap-1 sm:gap-1.5 bg-[#fff1ed] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#dfe0ff]">
+              <span className="material-symbols-outlined text-[#2a3691] text-base sm:text-lg font-variation-fill">diamond</span>
+              <span className="font-bold text-xs sm:text-sm text-[#0e1c7b]">480</span>
             </div>
 
-            <div className="hidden sm:flex items-center gap-1.5 bg-[#fff1ed] px-3 py-1.5 rounded-full border border-[#ffdad6]">
-              <span className="material-symbols-outlined text-[#ba1a1a] text-lg font-variation-fill">favorite</span>
-              <span className="font-bold text-sm text-[#ba1a1a]">5/5</span>
+            <div className="hidden sm:flex items-center gap-1 sm:gap-1.5 bg-[#fff1ed] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#ffdad6]">
+              <span className="material-symbols-outlined text-[#ba1a1a] text-base sm:text-lg font-variation-fill">favorite</span>
+              <span className="font-bold text-xs sm:text-sm text-[#ba1a1a]">5/5</span>
             </div>
 
             {/* Target: //header//button[contains(., 'Perfil')] */}
@@ -138,17 +82,17 @@ export const CuadernoRepasoScreen: React.FC<Props> = ({ onNavigate }) => {
                 sounds.playTap();
                 onNavigate('perfil_dinamico', 'push');
               }}
-              className="flex items-center gap-2 p-1 pl-2 pr-3 rounded-full hover:bg-[#ffe9e4] transition-colors border border-[#c6c5d4]/50 cursor-pointer"
+              className="flex items-center gap-1.5 sm:gap-2 p-1 pl-1.5 sm:pl-2 pr-2 sm:pr-3 rounded-full hover:bg-[#ffe9e4] transition-colors border border-[#c6c5d4]/50 cursor-pointer"
               type="button"
             >
-              <div className="w-8 h-8 rounded-full bg-[#ffdbc9] flex items-center justify-center text-[#753400] font-bold text-xs ring-2 ring-[#2a3691]/20">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#ffdbc9] flex items-center justify-center text-[#753400] font-bold text-xs ring-2 ring-[#2a3691]/20">
                 PA
               </div>
-              <span className="font-bold text-sm text-[#0e1c7b] hidden sm:inline">Perfil</span>
+              <span className="font-bold text-xs sm:text-sm text-[#0e1c7b] hidden sm:inline">Perfil</span>
             </button>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* Main Canvas */}
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-10 py-6 md:py-10 flex flex-col gap-8">
@@ -315,11 +259,10 @@ export const CuadernoRepasoScreen: React.FC<Props> = ({ onNavigate }) => {
                         sounds.playTap();
                         setSelectedWord(key);
                       }}
-                      className={`px-3.5 py-1.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
-                        isAct
+                      className={`px-3.5 py-1.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${isAct
                           ? 'bg-[#0e1c7b] text-white shadow-sm'
                           : 'bg-[#fff1ed] text-[#454652] hover:bg-[#ffe9e4]'
-                      }`}
+                        }`}
                       type="button"
                     >
                       {item.term}
@@ -398,9 +341,8 @@ export const CuadernoRepasoScreen: React.FC<Props> = ({ onNavigate }) => {
                   </p>
                   <button
                     onClick={handleRecord}
-                    className={`w-full sm:w-auto px-5 py-2.5 rounded-2xl ${
-                      isRecording ? 'bg-[#ba1a1a] animate-pulse' : 'bg-[#2a3691] hover:bg-[#0e1c7b]'
-                    } text-white text-xs font-bold flex items-center justify-center gap-2 shadow-duo-blue btn-3d cursor-pointer shrink-0`}
+                    className={`w-full sm:w-auto px-5 py-2.5 rounded-2xl ${isRecording ? 'bg-[#ba1a1a] animate-pulse' : 'bg-[#2a3691] hover:bg-[#0e1c7b]'
+                      } text-white text-xs font-bold flex items-center justify-center gap-2 shadow-duo-blue btn-3d cursor-pointer shrink-0`}
                     type="button"
                   >
                     <span className="material-symbols-outlined text-lg font-variation-fill">mic</span>
@@ -604,7 +546,7 @@ export const CuadernoRepasoScreen: React.FC<Props> = ({ onNavigate }) => {
           <div className="flex flex-col items-center md:items-start gap-1">
             <span className="font-bold text-[#9a4600]">Allikiwa</span>
             <p className="text-xs text-[#454652]">
-              © 2024 Allikiwa. Promoviendo el Quechua Chanka y Aimara. Todos los derechos reservados.
+              © 2026 Allikiwa. Promoviendo el Quechua Chanka y Aimara. Todos los derechos reservados.
             </p>
           </div>
           <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-semibold text-[#454652]">

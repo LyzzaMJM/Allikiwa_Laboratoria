@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScreenId, TransitionType } from '../types';
 import { sounds } from '../utils/audio';
+import { saveUser, loadUser } from '../utils/storage';
 
 interface Props {
   onNavigate: (screen: ScreenId, transition?: TransitionType) => void;
@@ -10,14 +11,45 @@ export const PerfilRegistroScreen: React.FC<Props> = ({ onNavigate }) => {
   const [authMode, setAuthMode] = useState<'register' | 'login'>('register');
   const [nombre, setNombre] = useState('Inti Kusikuy');
   const [email, setEmail] = useState('yachachiq@allikiwa.pe');
-  const [password, setPassword] = useState('••••••••••••');
+  const [password, setPassword] = useState('');
   const [targetLang, setTargetLang] = useState<'quechua' | 'aimara'>('quechua');
   const [dailyGoal, setDailyGoal] = useState<'casual' | 'regular' | 'intenso'>('regular');
+
+  // Precargar datos guardados si ya existe una cuenta local
+  useEffect(() => {
+    const saved = loadUser();
+    if (saved) {
+      setNombre(saved.nombre);
+      setEmail(saved.email);
+      setTargetLang(saved.targetLang);
+      setDailyGoal(saved.dailyGoal);
+      // Si ya tiene cuenta, mostrar login por defecto
+      setAuthMode('login');
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     sounds.playSuccess();
-    onNavigate('perfil_dinamico', 'push');
+    if (authMode === 'register') {
+      // Guardar cuenta en localStorage
+      saveUser({
+        nombre,
+        email,
+        targetLang,
+        dailyGoal,
+        streak: 1,
+        gems: 50,
+        hearts: 5,
+        isPro: false,
+        createdAt: new Date().toISOString(),
+      });
+      // Al registrarse: mostrar ProModal antes de ir al perfil
+      onNavigate('pro_popup', 'slide_up');
+    } else {
+      // Login: ir directo al perfil
+      onNavigate('perfil_dinamico', 'push');
+    }
   };
 
   return (
@@ -38,7 +70,7 @@ export const PerfilRegistroScreen: React.FC<Props> = ({ onNavigate }) => {
               <img
                 alt="Logo Allikiwa"
                 className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-2xl drop-shadow-sm group-hover:rotate-6 transition-transform duration-200"
-                src={`${import.meta.env.BASE_URL}images/logo.png`}
+                src={`${import.meta.env.BASE_URL}images/loguitodos.png`}
               />
               <span className="font-display text-[26px] font-bold text-[#f27a21] tracking-tight">Allikiwa</span>
             </a>
@@ -48,33 +80,7 @@ export const PerfilRegistroScreen: React.FC<Props> = ({ onNavigate }) => {
             </span>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="flex items-center gap-6 sm:gap-8">
-            <a
-              className="text-[#454652] font-semibold text-sm sm:text-base hover:text-[#0e1c7b] transition-colors flex items-center gap-1.5 py-1 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('traductor', 'push_back');
-              }}
-              href="#traductor"
-            >
-              <span className="material-symbols-outlined text-[20px]">translate</span>
-              <span>Traductor</span>
-            </a>
-            <a
-              className="text-[#454652] font-semibold text-sm sm:text-base hover:text-[#0e1c7b] transition-colors flex items-center gap-1.5 py-1 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('mapa_quechua', 'push');
-              }}
-              href="#aprender"
-            >
-              <span className="material-symbols-outlined text-[20px]">school</span>
-              <span>Aprender</span>
-            </a>
-          </nav>
+
 
           {/* Trailing Stats */}
           <div className="flex items-center gap-2 sm:gap-4">
@@ -135,7 +141,7 @@ export const PerfilRegistroScreen: React.FC<Props> = ({ onNavigate }) => {
             </a>
             <span className="px-3 py-1 bg-white/90 text-[#2a3691] text-xs rounded-full border border-[#2a3691]/20 font-bold uppercase tracking-wider hidden sm:flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-[#3ca21d] animate-pulse"></span>
-              Plataforma Abierta 2024
+              Plataforma Abierta 2026
             </span>
           </div>
         </div>
@@ -146,18 +152,16 @@ export const PerfilRegistroScreen: React.FC<Props> = ({ onNavigate }) => {
           <section className="lg:col-span-7 bg-white rounded-3xl p-6 md:p-8 border-2 border-[#ede8df] shadow-[0_4px_20px_-4px_rgba(42,54,145,0.07)] relative">
             <div className="flex p-1.5 bg-[#fff1ed] rounded-2xl border border-[#ede8df] mb-6">
               <button
-                className={`flex-1 py-3 text-center rounded-xl font-display font-bold text-sm md:text-base transition-all ${
-                  authMode === 'register' ? 'bg-white text-[#0e1c7b] shadow-sm' : 'text-[#454652] hover:text-[#0e1c7b]'
-                }`}
+                className={`flex-1 py-3 text-center rounded-xl font-display font-bold text-sm md:text-base transition-all ${authMode === 'register' ? 'bg-white text-[#0e1c7b] shadow-sm' : 'text-[#454652] hover:text-[#0e1c7b]'
+                  }`}
                 onClick={() => setAuthMode('register')}
                 type="button"
               >
                 Crear cuenta nueva
               </button>
               <button
-                className={`flex-1 py-3 text-center rounded-xl font-display font-bold text-sm md:text-base transition-all ${
-                  authMode === 'login' ? 'bg-white text-[#0e1c7b] shadow-sm' : 'text-[#454652] hover:text-[#0e1c7b]'
-                }`}
+                className={`flex-1 py-3 text-center rounded-xl font-display font-bold text-sm md:text-base transition-all ${authMode === 'login' ? 'bg-white text-[#0e1c7b] shadow-sm' : 'text-[#454652] hover:text-[#0e1c7b]'
+                  }`}
                 onClick={() => setAuthMode('login')}
                 type="button"
               >
@@ -264,9 +268,8 @@ export const PerfilRegistroScreen: React.FC<Props> = ({ onNavigate }) => {
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       <label className="cursor-pointer relative" onClick={() => setTargetLang('quechua')}>
-                        <div className={`p-3.5 rounded-2xl border-2 transition-all flex items-center gap-3 ${
-                          targetLang === 'quechua' ? 'border-[#2a3691] bg-[#2a3691]/5 shadow-sm' : 'border-[#ede8df]'
-                        }`}>
+                        <div className={`p-3.5 rounded-2xl border-2 transition-all flex items-center gap-3 ${targetLang === 'quechua' ? 'border-[#2a3691] bg-[#2a3691]/5 shadow-sm' : 'border-[#ede8df]'
+                          }`}>
                           <div className="w-9 h-9 rounded-xl bg-[#2a3691] text-white flex items-center justify-center font-black text-sm">
                             Q
                           </div>
@@ -277,9 +280,8 @@ export const PerfilRegistroScreen: React.FC<Props> = ({ onNavigate }) => {
                         </div>
                       </label>
                       <label className="cursor-pointer relative" onClick={() => setTargetLang('aimara')}>
-                        <div className={`p-3.5 rounded-2xl border-2 transition-all flex items-center gap-3 ${
-                          targetLang === 'aimara' ? 'border-[#3ca21d] bg-[#3ca21d]/5 shadow-sm' : 'border-[#ede8df]'
-                        }`}>
+                        <div className={`p-3.5 rounded-2xl border-2 transition-all flex items-center gap-3 ${targetLang === 'aimara' ? 'border-[#3ca21d] bg-[#3ca21d]/5 shadow-sm' : 'border-[#ede8df]'
+                          }`}>
                           <div className="w-9 h-9 rounded-xl bg-[#3ca21d] text-white flex items-center justify-center font-black text-sm">
                             A
                           </div>
@@ -302,9 +304,8 @@ export const PerfilRegistroScreen: React.FC<Props> = ({ onNavigate }) => {
                         <div
                           key={g}
                           onClick={() => setDailyGoal(g)}
-                          className={`p-2.5 text-center rounded-2xl border-2 cursor-pointer transition-all ${
-                            dailyGoal === g ? 'border-[#ff842c] bg-[#fff5ee] shadow-sm' : 'border-[#ede8df]'
-                          }`}
+                          className={`p-2.5 text-center rounded-2xl border-2 cursor-pointer transition-all ${dailyGoal === g ? 'border-[#ff842c] bg-[#fff5ee] shadow-sm' : 'border-[#ede8df]'
+                            }`}
                         >
                           <div className="font-display font-bold text-xs text-[#ff842c] capitalize">{g}</div>
                           <div className="font-black text-sm text-[#3b0900]">
@@ -440,7 +441,7 @@ export const PerfilRegistroScreen: React.FC<Props> = ({ onNavigate }) => {
             <span className="font-headline-sm text-headline-sm font-bold text-[#9a4600]">Allikiwa</span>
             <span className="hidden md:inline text-[#c6c5d4]">•</span>
             <p className="text-xs text-[#454652]">
-              © 2024 Allikiwa. Promoviendo el Quechua Chanka y Aimara. Todos los derechos reservados.
+              © 2026 Allikiwa. Promoviendo el Quechua Chanka y Aimara. Todos los derechos reservados.
             </p>
           </div>
           <nav className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs font-semibold text-[#454652]">
