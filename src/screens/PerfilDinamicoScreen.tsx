@@ -57,14 +57,6 @@ export const PerfilDinamicoScreen: React.FC<Props> = ({ onNavigate }) => {
               </span>
               <span className="text-xs sm:text-sm font-black text-[#2a3691]">{isLoggedIn ? '320' : '0'}</span>
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2 pl-1.5 sm:pl-2 pr-1 py-1 rounded-full border border-[#ede8df] bg-[#fff8f6]">
-              <div className="w-8 h-8 rounded-full bg-[#ff842c] text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                <span className="material-symbols-outlined text-sm">person</span>
-              </div>
-              <span className="text-xs sm:text-sm font-bold text-[#0e1c7b] hidden sm:inline">
-                {isLoggedIn ? userName.split(' ')[0] : 'Invitado'}
-              </span>
-            </div>
           </div>
         }
       />

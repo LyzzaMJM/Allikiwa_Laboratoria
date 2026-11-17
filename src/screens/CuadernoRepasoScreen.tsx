@@ -75,21 +75,6 @@ export const CuadernoRepasoScreen: React.FC<Props> = ({ onNavigate }) => {
               <span className="material-symbols-outlined text-[#ba1a1a] text-base sm:text-lg font-variation-fill">favorite</span>
               <span className="font-bold text-xs sm:text-sm text-[#ba1a1a]">5/5</span>
             </div>
-
-            {/* Target: //header//button[contains(., 'Perfil')] */}
-            <button
-              onClick={() => {
-                sounds.playTap();
-                onNavigate('perfil_dinamico', 'push');
-              }}
-              className="flex items-center gap-1.5 sm:gap-2 p-1 pl-1.5 sm:pl-2 pr-2 sm:pr-3 rounded-full hover:bg-[#ffe9e4] transition-colors border border-[#c6c5d4]/50 cursor-pointer"
-              type="button"
-            >
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#ffdbc9] flex items-center justify-center text-[#753400] font-bold text-xs ring-2 ring-[#2a3691]/20">
-                PA
-              </div>
-              <span className="font-bold text-xs sm:text-sm text-[#0e1c7b] hidden sm:inline">Perfil</span>
-            </button>
           </div>
         }
       />

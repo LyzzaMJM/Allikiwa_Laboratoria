@@ -264,21 +264,6 @@ export const TraductorScreen: React.FC<Props> = ({
               <span className="xs:hidden">{isVoiceMode ? 'Voz ON' : 'Modo Voz'}</span>
               <span className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${isVoiceMode ? 'bg-white animate-pulse' : 'bg-[#f27a21]'}`} />
             </button>
-
-            {/* Profile */}
-            <button
-              aria-label="Perfil y racha"
-              className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-[#fdf2e9] border-2 border-[#f3d3bc] text-[#f27a21] flex items-center justify-center hover:bg-[#fff3e8] shadow-duo-neutral btn-3d cursor-pointer shrink-0"
-              type="button"
-              onClick={() => {
-                sounds.playTap();
-                onNavigate('perfil', 'push');
-              }}
-            >
-              <span className="material-symbols-outlined text-[20px] sm:text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                face_6
-              </span>
-            </button>
           </>
         }
       />

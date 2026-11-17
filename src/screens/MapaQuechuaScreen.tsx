@@ -5,9 +5,11 @@ import { AppHeader } from '../components/AppHeader';
 
 interface Props {
   onNavigate: (screen: ScreenId, transition?: TransitionType) => void;
+  userLevel?: 'principiante' | 'intermedio' | 'avanzado';
+  variant?: 'chanka' | 'collao';
 }
 
-export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate }) => {
+export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate, userLevel = 'principiante', variant = 'chanka' }) => {
   return (
     <div className="bg-[#fff8f6] text-[#3b0900] font-body-md antialiased min-h-screen flex flex-col selection:bg-[#ffdbc9]">
       {/* ==================== TOP NAV BAR ==================== */}
@@ -39,22 +41,6 @@ export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate }) => {
               </span>
               <span className="font-bold text-xs sm:text-sm text-[#d83a3a]">5/5</span>
             </div>
-
-            {/* Profile Avatar */}
-            <a
-              className="ml-0.5 p-0.5 sm:p-1 rounded-full border-2 border-[#f27a21] hover:shadow-md transition-all cursor-pointer shrink-0"
-              href="#perfil"
-              onClick={(e) => {
-                e.preventDefault();
-                sounds.playTap();
-                onNavigate('perfil_dinamico', 'push');
-              }}
-              title="Mi Perfil"
-            >
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#2a3691] text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-inner overflow-hidden">
-                <span className="material-symbols-outlined text-lg sm:text-xl">person</span>
-              </div>
-            </a>
           </div>
         }
       />
@@ -68,9 +54,16 @@ export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate }) => {
               <span className="material-symbols-outlined text-2xl font-variation-fill">auto_stories</span>
             </div>
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#767683]">Lengua de Estudio Actual</span>
               <div className="flex items-center gap-2">
-                <h1 className="font-playful text-xl md:text-2xl font-bold text-[#0e1c7b]">Quechua Chanka (Ayacucho)</h1>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#767683]">Lengua de Estudio Actual</span>
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f3edf7] text-[#49454f]">
+                  {userLevel === 'principiante' ? 'Nivel: Desde cero' : userLevel === 'intermedio' ? 'Nivel: Intermedio' : 'Nivel: Avanzado'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-playful text-xl md:text-2xl font-bold text-[#0e1c7b]">
+                  {variant === 'collao' ? 'Quechua Collao (Cusco / Puno)' : 'Quechua Chanka (Ayacucho)'}
+                </h1>
                 <span className="bg-[#91fb6e] text-[#042100] text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">
                   ACTIVO
                 </span>

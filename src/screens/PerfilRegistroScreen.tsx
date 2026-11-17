@@ -94,16 +94,6 @@ export const PerfilRegistroScreen: React.FC<Props> = ({ onNavigate }) => {
               <span className="material-symbols-outlined material-symbols-fill text-[#2a3691] text-[18px]">diamond</span>
               <span className="text-sm font-black text-[#2a3691]">0</span>
             </div>
-            <button
-              aria-label="Perfil y racha"
-              onClick={() => onNavigate('perfil_dinamico', 'push')}
-              className="border-b-2 border-[#0e1c7b] text-[#0e1c7b] font-bold text-sm flex items-center gap-2 py-1 pl-1 cursor-pointer"
-            >
-              <div className="w-9 h-9 rounded-2xl bg-[#ffe2db] border-2 border-dashed border-[#c6c5d4] p-0.5 flex items-center justify-center text-[#767683]">
-                <span className="material-symbols-outlined text-[20px]">account_circle</span>
-              </div>
-              <span className="hidden sm:inline">Invitado</span>
-            </button>
           </div>
         </div>
       </header>
