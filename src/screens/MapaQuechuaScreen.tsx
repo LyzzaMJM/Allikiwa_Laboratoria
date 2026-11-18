@@ -2,48 +2,61 @@ import React from 'react';
 import { ScreenId, TransitionType } from '../types';
 import { sounds } from '../utils/audio';
 import { AppHeader } from '../components/AppHeader';
+import { UserLevelType, LEVEL_LABELS } from '../components/LevelConfigModal';
 
 interface Props {
   onNavigate: (screen: ScreenId, transition?: TransitionType) => void;
-  userLevel?: 'principiante' | 'intermedio' | 'avanzado';
+  userLevel?: UserLevelType;
   variant?: 'chanka' | 'collao';
+  onOpenLanguageModal?: () => void;
+  onOpenLevelModal?: () => void;
+  showHeader?: boolean;
 }
 
-export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate, userLevel = 'principiante', variant = 'chanka' }) => {
+export const MapaQuechuaScreen: React.FC<Props> = ({
+  onNavigate,
+  userLevel = 'desde_cero',
+  variant = 'chanka',
+  onOpenLanguageModal,
+  onOpenLevelModal,
+  showHeader = false,
+}) => {
   return (
     <div className="bg-[#fff8f6] text-[#3b0900] font-body-md antialiased min-h-screen flex flex-col selection:bg-[#ffdbc9]">
-      {/* ==================== TOP NAV BAR ==================== */}
-      <AppHeader
-        onNavigate={onNavigate}
-        rightContent={
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            {/* Streak */}
-            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
-              <span className="material-symbols-outlined text-[#f27a21] font-variation-fill text-lg sm:text-xl">
-                local_fire_department
-              </span>
-              <span className="font-bold text-xs sm:text-sm text-[#9a4600]">5</span>
-              <span className="text-[10px] font-semibold text-[#9a4600] hidden md:inline">días</span>
-            </div>
+      {/* ==================== OPTIONAL TOP NAV BAR (When rendered standalone) ==================== */}
+      {showHeader && (
+        <AppHeader
+          onNavigate={onNavigate}
+          rightContent={
+            <div className="flex items-center gap-1.5 sm:gap-3">
+              {/* Streak */}
+              <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
+                <span className="material-symbols-outlined text-[#f27a21] font-variation-fill text-lg sm:text-xl">
+                  local_fire_department
+                </span>
+                <span className="font-bold text-xs sm:text-sm text-[#9a4600]">5</span>
+                <span className="text-[10px] font-semibold text-[#9a4600] hidden md:inline">días</span>
+              </div>
 
-            {/* Crystals */}
-            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
-              <span className="material-symbols-outlined text-[#1cb0f6] font-variation-fill text-lg sm:text-xl">
-                diamond
-              </span>
-              <span className="font-bold text-xs sm:text-sm text-[#0e1c7b]">480</span>
-            </div>
+              {/* Crystals */}
+              <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
+                <span className="material-symbols-outlined text-[#1cb0f6] font-variation-fill text-lg sm:text-xl">
+                  diamond
+                </span>
+                <span className="font-bold text-xs sm:text-sm text-[#0e1c7b]">480</span>
+              </div>
 
-            {/* Hearts */}
-            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
-              <span className="material-symbols-outlined text-[#ff4b4b] font-variation-fill text-lg sm:text-xl">
-                favorite
-              </span>
-              <span className="font-bold text-xs sm:text-sm text-[#d83a3a]">5/5</span>
+              {/* Hearts */}
+              <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs">
+                <span className="material-symbols-outlined text-[#ff4b4b] font-variation-fill text-lg sm:text-xl">
+                  favorite
+                </span>
+                <span className="font-bold text-xs sm:text-sm text-[#d83a3a]">5/5</span>
+              </div>
             </div>
-          </div>
-        }
-      />
+          }
+        />
+      )}
 
       {/* ==================== MAIN CONTENT CANVAS ==================== */}
       <main className="flex-grow w-full max-w-[1200px] mx-auto px-4 md:px-10 py-6">
@@ -57,7 +70,7 @@ export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate, userLevel = 'pr
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#767683]">Lengua de Estudio Actual</span>
                 <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#f3edf7] text-[#49454f]">
-                  {userLevel === 'principiante' ? 'Nivel: Desde cero' : userLevel === 'intermedio' ? 'Nivel: Intermedio' : 'Nivel: Avanzado'}
+                  Nivel: {LEVEL_LABELS[userLevel] || 'Desde cero'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -72,24 +85,33 @@ export const MapaQuechuaScreen: React.FC<Props> = ({ onNavigate, userLevel = 'pr
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Navigation Target: //button[contains(., 'Cambiar a') and contains(., 'Aimara')] */}
             <button
               onClick={() => {
                 sounds.playTap();
-                onNavigate('ruta_aimara', 'none');
+                if (onOpenLanguageModal) {
+                  onOpenLanguageModal();
+                } else {
+                  onNavigate('ruta_aimara', 'none');
+                }
               }}
               className="btn-3d bg-[#fff1ed] hover:bg-[#ffe9e4] border border-[#ffe2db] text-[#0e1c7b] font-bold text-sm px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-xs transition-all cursor-pointer"
               type="button"
             >
               <span className="material-symbols-outlined text-lg text-[#9a4600]">cached</span>
-              <span>Cambiar a <strong>Aimara</strong></span>
+              <span>Cambiar lengua</span>
             </button>
             <button
-              className="btn-3d bg-[#fff1ed] hover:bg-[#ffe9e4] border border-[#ffe2db] text-[#454652] p-2.5 rounded-2xl cursor-pointer"
-              title="Configuración de nivel"
+              onClick={() => {
+                sounds.playTap();
+                if (onOpenLevelModal) {
+                  onOpenLevelModal();
+                }
+              }}
+              className="btn-3d bg-[#fff1ed] hover:bg-[#ffe9e4] border border-[#ffe2db] text-[#454652] hover:text-[#0e1c7b] p-2.5 rounded-2xl cursor-pointer"
+              title="Configurar nivel de usuario"
               type="button"
             >
-              <span className="material-symbols-outlined text-lg">tune</span>
+              <span className="material-symbols-outlined text-lg">settings</span>
             </button>
           </div>
         </section>

@@ -5,9 +5,15 @@ import { AppHeader } from '../components/AppHeader';
 
 interface Props {
   onNavigate: (screen: ScreenId, transition?: TransitionType) => void;
+  onBackToLearn?: () => void;
+  showHeader?: boolean;
 }
 
-export const CuadernoRepasoScreen: React.FC<Props> = ({ onNavigate }) => {
+export const CuadernoRepasoScreen: React.FC<Props> = ({
+  onNavigate,
+  onBackToLearn,
+  showHeader = false,
+}) => {
   const [selectedWord, setSelectedWord] = useState<'pitiy' | 'tanta' | 'chaska'>('pitiy');
   const [isRecording, setIsRecording] = useState(false);
 
@@ -55,32 +61,75 @@ export const CuadernoRepasoScreen: React.FC<Props> = ({ onNavigate }) => {
   return (
     <div className="bg-[#fff8f6] text-[#3b0900] min-h-screen flex flex-col font-body-md antialiased selection:bg-[#ffdbc9]">
       {/* TopNavBar */}
-      <AppHeader
-        onNavigate={onNavigate}
-        rightContent={
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            <div className="flex items-center gap-1 sm:gap-1.5 bg-[#fff1ed] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#ffdbc9]">
-              <span className="material-symbols-outlined text-[#ff842c] text-base sm:text-lg font-variation-fill">
-                local_fire_department
-              </span>
-              <span className="font-bold text-xs sm:text-sm text-[#9a4600]">5</span>
-            </div>
+      {showHeader && (
+        <AppHeader
+          onNavigate={onNavigate}
+          leftContent={
+            <button
+              onClick={() => {
+                sounds.playTap();
+                if (onBackToLearn) {
+                  onBackToLearn();
+                } else {
+                  onNavigate('mapa_quechua', 'none');
+                }
+              }}
+              className="btn-3d flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#fff1ed] hover:bg-[#ffe9e4] border border-[#ffe2db] text-[#2a3691] font-chubby text-xs sm:text-sm font-bold cursor-pointer"
+              title="Volver a la ruta de aprendizaje"
+              type="button"
+            >
+              <span className="material-symbols-outlined text-base">arrow_back</span>
+              <span>← Volver</span>
+            </button>
+          }
+          rightContent={
+            <div className="flex items-center gap-1.5 sm:gap-3">
+              <div className="flex items-center gap-1 sm:gap-1.5 bg-[#fff1ed] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#ffdbc9]">
+                <span className="material-symbols-outlined text-[#ff842c] text-base sm:text-lg font-variation-fill">
+                  local_fire_department
+                </span>
+                <span className="font-bold text-xs sm:text-sm text-[#9a4600]">5</span>
+              </div>
 
-            <div className="flex items-center gap-1 sm:gap-1.5 bg-[#fff1ed] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#dfe0ff]">
-              <span className="material-symbols-outlined text-[#2a3691] text-base sm:text-lg font-variation-fill">diamond</span>
-              <span className="font-bold text-xs sm:text-sm text-[#0e1c7b]">480</span>
-            </div>
+              <div className="flex items-center gap-1 sm:gap-1.5 bg-[#fff1ed] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#dfe0ff]">
+                <span className="material-symbols-outlined text-[#2a3691] text-base sm:text-lg font-variation-fill">diamond</span>
+                <span className="font-bold text-xs sm:text-sm text-[#0e1c7b]">480</span>
+              </div>
 
-            <div className="hidden sm:flex items-center gap-1 sm:gap-1.5 bg-[#fff1ed] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#ffdad6]">
-              <span className="material-symbols-outlined text-[#ba1a1a] text-base sm:text-lg font-variation-fill">favorite</span>
-              <span className="font-bold text-xs sm:text-sm text-[#ba1a1a]">5/5</span>
+              <div className="hidden sm:flex items-center gap-1 sm:gap-1.5 bg-[#fff1ed] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[#ffdad6]">
+                <span className="material-symbols-outlined text-[#ba1a1a] text-base sm:text-lg font-variation-fill">favorite</span>
+                <span className="font-bold text-xs sm:text-sm text-[#ba1a1a]">5/5</span>
+              </div>
             </div>
-          </div>
-        }
-      />
+          }
+        />
+      )}
 
       {/* Main Canvas */}
-      <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-10 py-6 md:py-10 flex flex-col gap-8">
+      <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-10 py-6 md:py-8 flex flex-col gap-6">
+        {/* Barra superior de retorno claro: ← Volver a Aprender */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => {
+              sounds.playTap();
+              if (onBackToLearn) {
+                onBackToLearn();
+              } else {
+                onNavigate('mapa_quechua', 'none');
+              }
+            }}
+            className="btn-3d inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white hover:bg-[#fff1ed] border-2 border-[#2a3691] text-[#2a3691] font-chubby font-bold text-xs sm:text-sm shadow-xs transition-all active:scale-95 cursor-pointer"
+            type="button"
+          >
+            <span className="material-symbols-outlined text-base sm:text-lg">arrow_back</span>
+            <span>← Volver a Aprender</span>
+          </button>
+
+          <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-[#8c7e73] bg-white px-3.5 py-2 rounded-2xl border border-[#ede8df] shadow-2xs">
+            <span className="material-symbols-outlined text-base text-[#3ca21d]">auto_stories</span>
+            <span>Cuaderno de Repaso y Fonética</span>
+          </div>
+        </div>
         {/* 1. Bento Header Motivador con Kusi */}
         <section className="bg-white rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border-2 border-[#ede8df] shadow-duo-card relative overflow-hidden">
           <div className="flex flex-col md:flex-row items-center gap-6 z-10 text-center md:text-left">
