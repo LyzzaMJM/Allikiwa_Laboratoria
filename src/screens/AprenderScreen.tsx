@@ -98,7 +98,7 @@ export const AprenderScreen: React.FC<Props> = ({ onNavigate, initialTab = 'quec
   return (
     <div className="min-h-screen bg-[#fff8f6] flex flex-col pb-20">
       {/* ========================================================================= */}
-      {/* NAVBAR UNIFICADO Y LIMPIO: LOGO + LENGUA ACTUAL + BOTÓN CAMBIAR LENGUA     */}
+      {/* NAVBAR SUPERIOR LIMPIO: LOGO A LA IZQUIERDA | RACHA, DIAMANTES Y VIDAS A LA DERECHA */}
       {/* ========================================================================= */}
       <AppHeader
         onNavigate={onNavigate}
@@ -119,83 +119,39 @@ export const AprenderScreen: React.FC<Props> = ({ onNavigate, initialTab = 'quec
           ) : undefined
         }
         rightContent={
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
-            {/* 1. Nombre de la lengua actual (Chip estilizado) */}
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            {/* Racha */}
             <div
-              onClick={() => {
-                sounds.playTap();
-                setIsLanguageModalOpen(true);
-              }}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-[#fff1ed] border border-[#ffe2db] text-[#0e1c7b] hover:bg-[#ffe9e4] transition-colors cursor-pointer select-none"
-              title="Lengua actual de estudio"
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs"
+              title="5 días de racha de estudio"
             >
-              <span className="material-symbols-outlined text-base text-[#f27a21]">translate</span>
-              <span className="font-chubby font-bold text-xs sm:text-sm">
-                {getCurrentLanguageLabel()}
+              <span className="material-symbols-outlined text-[#f27a21] font-variation-fill text-lg sm:text-xl">
+                local_fire_department
               </span>
+              <span className="font-bold text-xs sm:text-sm text-[#9a4600]">5</span>
+              <span className="text-[10px] font-semibold text-[#9a4600] hidden sm:inline">días</span>
             </div>
 
-            {/* 2. Botón Cambiar lengua */}
-            <button
-              onClick={() => {
-                sounds.playTap();
-                setIsLanguageModalOpen(true);
-              }}
-              className="btn-3d flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl bg-[#2a3691] hover:bg-[#202b74] text-white font-chubby text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
-              type="button"
-              title="Abrir selector de lenguas"
+            {/* Cristales */}
+            <div
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs"
+              title="480 cristales de sabiduría"
             >
-              <span className="material-symbols-outlined text-base sm:text-lg">swap_horiz</span>
-              <span className="hidden xs:inline">Cambiar lengua</span>
-            </button>
+              <span className="material-symbols-outlined text-[#1cb0f6] font-variation-fill text-lg sm:text-xl">
+                diamond
+              </span>
+              <span className="font-bold text-xs sm:text-sm text-[#0e1c7b]">480</span>
+            </div>
 
-            {/* 3. Icono de Configuración de Nivel (Engranaje) */}
-            <button
-              onClick={() => {
-                sounds.playTap();
-                setIsLevelModalOpen(true);
-              }}
-              className="btn-3d w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-[#fff1ed] hover:bg-[#ffe9e4] border border-[#ffe2db] text-[#454652] hover:text-[#0e1c7b] flex items-center justify-center transition-colors cursor-pointer"
-              title={`Configurar nivel (Nivel actual: ${LEVEL_LABELS[userLevel]})`}
-              type="button"
+            {/* Vidas */}
+            <div
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs"
+              title="5/5 vidas restantes"
             >
-              <span className="material-symbols-outlined text-lg sm:text-xl">settings</span>
-            </button>
-
-            {/* 4. Gamificación: Racha, Cristales, Vidas (Visibles en pantallas medianas+) */}
-            <div className="hidden md:flex items-center gap-2 pl-2 border-l border-[#ede8df]">
-              {/* Racha */}
-              <div
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs"
-                title="Días de racha de estudio"
-              >
-                <span className="material-symbols-outlined text-[#f27a21] font-variation-fill text-base">
-                  local_fire_department
-                </span>
-                <span className="font-bold text-xs text-[#9a4600]">5</span>
-              </div>
-
-              {/* Cristales */}
-              <div
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs"
-                title="Cristales de sabiduría"
-              >
-                <span className="material-symbols-outlined text-[#1cb0f6] font-variation-fill text-base">
-                  diamond
-                </span>
-                <span className="font-bold text-xs text-[#0e1c7b]">480</span>
-              </div>
-
-              {/* Vidas */}
-              <div
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#fff1ed] border border-[#ffe2db] shadow-xs"
-                title="Vidas restantes"
-              >
-                <span className="material-symbols-outlined text-[#ff4b4b] font-variation-fill text-base">
-                  favorite
-                </span>
-                <span className="font-bold text-xs text-[#d83a3a]">5/5</span>
-              </div>
+              <span className="material-symbols-outlined text-[#ff4b4b] font-variation-fill text-lg sm:text-xl">
+                favorite
+              </span>
+              <span className="font-bold text-xs sm:text-sm text-[#d83a3a]">5/5</span>
             </div>
           </div>
         }

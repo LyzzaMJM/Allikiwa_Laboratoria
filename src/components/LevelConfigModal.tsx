@@ -220,3 +220,4 @@ export const LevelConfigModal: React.FC<LevelConfigModalProps> = ({
     </div>
   );
 };
+
